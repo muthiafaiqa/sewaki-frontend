@@ -1,13 +1,16 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../services/api';
+import { dummyItems } from '../data/dummyData';
 
 const router = useRouter();
 
 const items = ref([]);
 const isLoading = ref(true);
 const errorMessage = ref('');
+const currentPage = ref(1);
+const itemsPerPage = 24;
 
 const formatPrice = (value) => {
   if (!value && value !== 0) return 'Hubungi Pemilik';
@@ -25,38 +28,72 @@ const fetchItems = async () => {
   isLoading.value = true;
   errorMessage.value = '';
   try {
-    const response = await api.get('/api/items', {
-      params: searchQuery.value ? { search: searchQuery.value } : {}
-    });
-    // Dukung format response.data langsung atau dibungkus di dalam response.data.data
+    const response = await api.get('/api/items');
     const data = response.data?.data || response.data;
-    if (Array.isArray(data)) {
+    if (Array.isArray(data) && data.length > 0) {
       items.value = data;
     } else {
-      items.value = [];
+      console.warn('API returned empty items, using dummy data fallback.');
+      items.value = dummyItems;
     }
   } catch (error) {
-    console.error('Fetch items error:', error);
-    errorMessage.value = error.response?.data?.message || error.message || 'Gagal memuat daftar barang sewa.';
+    console.warn('Fetch items error, falling back to dummy data:', error);
+    items.value = dummyItems;
   } finally {
     isLoading.value = false;
+  }
+};
+
+const filteredItems = computed(() => {
+  let result = items.value;
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase();
+    result = result.filter(item => 
+      (item.nama_barang || item.name || '').toLowerCase().includes(q) ||
+      (item.category || '').toLowerCase().includes(q)
+    );
+  }
+  return result;
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredItems.value.length / itemsPerPage) || 1;
+});
+
+const paginatedItems = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredItems.value.slice(start, end);
+});
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  }
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    window.scrollTo({ top: 400, behavior: 'smooth' });
   }
 };
 
 const handleSearch = (event) => {
   if (searchTimeout) clearTimeout(searchTimeout);
   if (event && event.key === 'Enter') {
-    fetchItems();
+    currentPage.value = 1;
   } else {
     searchTimeout = setTimeout(() => {
-      fetchItems();
+      currentPage.value = 1;
     }, 300);
   }
 };
 
 const clearSearch = () => {
   searchQuery.value = '';
-  fetchItems();
+  currentPage.value = 1;
 };
 
 const currentUser = ref(null);
@@ -175,7 +212,7 @@ const navigateToDetail = (itemId) => {
     <div v-else class="catalog-section">
       <h2 class="section-title">Katalog Barang Sewa</h2>
       <div class="items-grid">
-        <div v-for="item in items" :key="item.id" class="item-card" @click="navigateToDetail(item.id)">
+        <div v-for="item in paginatedItems" :key="item.id" class="item-card" @click="navigateToDetail(item.id)">
           <!-- Card Image Wrapper -->
           <div class="card-image-wrapper">
             <img 
@@ -218,7 +255,7 @@ const navigateToDetail = (itemId) => {
             </div>
             
             <div class="card-actions">
-              <button @click.stop="handleRent(item)" class="rent-btn">Sewa Sekarang</button>
+              <button @click.stop="handleRent(item)" class="rent-btn">Pinjam Barang Ini</button>
               <button 
                 v-if="currentUser?.role === 'admin'" 
                 @click.stop="handleDelete(item.id)" 
@@ -231,427 +268,16 @@ const navigateToDetail = (itemId) => {
           </div>
         </div>
       </div>
+
+      <!-- Pagination Controls -->
+      <div v-if="totalPages > 1" class="pagination-controls">
+        <button @click="prevPage" :disabled="currentPage === 1" class="pagination-btn">Sebelumnya</button>
+        <span class="pagination-info">Halaman {{ currentPage }} dari {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages" class="pagination-btn">Selanjutnya</button>
+      </div>
     </div>
   </div>
 </template>
 
-<style scoped>
-.home-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  box-sizing: border-box;
-}
+<style src="./Home.css" scoped></style>
 
-/* Hero Section */
-.hero-section {
-  text-align: center;
-  margin-bottom: 56px;
-  padding: 40px 20px;
-  background: radial-gradient(circle at 50% 50%, rgba(170, 59, 255, 0.08), transparent 70%);
-  border-radius: 24px;
-}
-
-.hero-section h1 {
-  font-size: 38px;
-  color: var(--text-h);
-  margin: 0 0 16px 0;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-
-.hero-subtitle {
-  font-size: 17px;
-  color: var(--text);
-  max-width: 650px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-/* Search Section */
-.search-section {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 40px;
-  width: 100%;
-}
-
-.search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 600px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 14px 16px 14px 48px;
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  font-size: 15px;
-  color: var(--text-h);
-  outline: none;
-  transition: all 0.2s ease-in-out;
-  box-shadow: var(--shadow);
-}
-
-.search-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-bg);
-  background: var(--bg-hover);
-}
-
-.search-icon {
-  position: absolute;
-  left: 16px;
-  width: 20px;
-  height: 20px;
-  color: var(--text-muted);
-  pointer-events: none;
-  transition: color 0.2s;
-}
-
-.search-input:focus + .search-icon,
-.search-input:focus ~ .search-icon {
-  color: var(--accent);
-}
-
-.clear-search-btn {
-  position: absolute;
-  right: 14px;
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s;
-}
-
-.clear-search-btn:hover {
-  color: #ef4444;
-}
-
-.clear-icon {
-  width: 16px;
-  height: 16px;
-}
-
-@media (max-width: 768px) {
-  .hero-section h1 {
-    font-size: 30px;
-  }
-  .hero-subtitle {
-    font-size: 15px;
-  }
-}
-
-/* Status Messages */
-.status-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  text-align: center;
-  color: var(--text);
-  gap: 16px;
-}
-
-.error-icon,
-.empty-icon {
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  margin-bottom: 8px;
-}
-
-.error-icon {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.empty-icon {
-  color: var(--accent);
-  background: var(--accent-bg);
-}
-
-.status-wrapper h3 {
-  font-size: 20px;
-  color: var(--text-h);
-  margin: 0;
-}
-
-.status-wrapper p {
-  max-width: 400px;
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-.retry-btn {
-  padding: 10px 24px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.retry-btn:hover {
-  opacity: 0.9;
-}
-
-/* Catalog Grid Styling */
-.section-title {
-  font-size: 24px;
-  color: var(--text-h);
-  margin-bottom: 32px;
-  font-weight: 700;
-}
-
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 32px;
-}
-
-.item-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-}
-
-.item-card:hover {
-  border-color: var(--accent-border);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(170, 59, 255, 0.1);
-}
-
-/* Image Placeholder & Wrapper */
-.card-image-wrapper {
-  position: relative;
-  height: 180px;
-  width: 100%;
-  overflow: hidden;
-  border-bottom: 1px solid var(--border);
-}
-
-.item-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.item-card:hover .item-image {
-  transform: scale(1.05);
-}
-
-.card-image-placeholder {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, var(--bg-hover) 0%, rgba(170, 59, 255, 0.08) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.box-icon {
-  width: 48px;
-  height: 48px;
-  color: rgba(170, 59, 255, 0.3);
-}
-
-.category-tag {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Content */
-.card-content {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.item-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-h);
-  margin: 0 0 12px 0;
-  line-height: 1.4;
-}
-
-.item-price {
-  margin-bottom: 16px;
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-}
-
-.price-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.price-period {
-  font-size: 13px;
-  color: var(--text);
-}
-
-.item-info {
-  margin-bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text);
-}
-
-.info-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.description-row {
-  margin-top: 8px;
-  border-top: 1px dashed var(--border);
-  padding-top: 8px;
-}
-
-.description-text {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.5;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.card-actions {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-  margin-top: auto;
-}
-
-.rent-btn {
-  width: 100%;
-  padding: 12px;
-  background: var(--bg-hover);
-  color: var(--text-h);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.item-card:hover .rent-btn {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 4px 12px rgba(170, 59, 255, 0.2);
-}
-
-.rent-btn:active {
-  transform: scale(0.98);
-}
-
-.delete-btn {
-  padding: 12px 16px;
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  border-radius: 8px;
-  font-size: 14.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.delete-btn:hover {
-  background: #ef4444;
-  color: #fff;
-  border-color: #ef4444;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-}
-
-.delete-btn:active {
-  transform: scale(0.98);
-}
-
-/* Spinner Animation */
-.spinner {
-  animation: rotate 2s linear infinite;
-  width: 40px;
-  height: 40px;
-}
-
-.spinner .path {
-  stroke: var(--accent);
-  stroke-linecap: round;
-  animation: dash 1.5s ease-in-out infinite;
-}
-
-@keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes dash {
-  0% {
-    stroke-dasharray: 1, 150;
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -35;
-  }
-  100% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -124;
-  }
-}
-</style>

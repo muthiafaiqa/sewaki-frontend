@@ -214,8 +214,9 @@ const handleLogout = () => {
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
   color: var(--text-h);
   transition: opacity 0.2s;
 }
