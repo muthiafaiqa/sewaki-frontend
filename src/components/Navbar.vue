@@ -117,10 +117,7 @@ const handleLogout = () => {
   <nav class="navbar">
     <div class="navbar-brand">
       <router-link to="/" class="logo-link">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="logo-icon">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-        <span>SewaKi</span>
+        <span>Sewa<span class="text-[#ff385c]">Ki</span></span>
       </router-link>
     </div>
     
@@ -192,52 +189,44 @@ const handleLogout = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 40px;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
+  padding: 16px 80px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-hairline);
   position: sticky;
   top: 0;
   z-index: 100;
   box-sizing: border-box;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .navbar {
-    padding: 16px 20px;
+    padding: 16px 24px;
   }
 }
 
 .navbar-brand .logo-link {
   display: flex;
   align-items: center;
-  gap: 10px;
   text-decoration: none;
   font-size: 22px;
   font-weight: 800;
-  letter-spacing: -0.05em;
-  color: var(--text-h);
-  transition: opacity 0.2s;
+  letter-spacing: -0.04em;
+  color: var(--color-ink);
+  transition: opacity 0.15s ease;
+  font-family: var(--font-sans);
 }
 
 .navbar-brand .logo-link:hover {
-  opacity: 0.9;
-}
-
-.logo-icon {
-  width: 24px;
-  height: 24px;
-  color: var(--accent);
+  opacity: 0.95;
 }
 
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 28px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .navbar-links {
     gap: 16px;
   }
@@ -245,70 +234,83 @@ const handleLogout = () => {
 
 .nav-item {
   text-decoration: none;
-  font-size: 14.5px;
-  font-weight: 500;
-  color: var(--text);
-  transition: all 0.2s ease-in-out;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted);
+  transition: all 0.15s ease;
   position: relative;
   padding: 6px 0;
+  font-family: var(--font-sans);
 }
 
 .nav-item:hover {
-  color: var(--text-h);
+  color: var(--color-ink);
 }
 
-/* Link active state underline effect */
+/* Route active indicator (tiny dot centered below item) */
 .nav-item.router-link-exact-active:not(.nav-btn) {
-  color: var(--accent);
+  color: var(--color-ink);
 }
 
 .nav-item.router-link-exact-active:not(.nav-btn)::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 2px;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: #ff385c;
+  border-radius: 50%;
 }
 
 /* Button style for Register link */
 .nav-btn {
-  background: var(--accent);
-  color: #fff;
+  background: #ff385c;
+  color: #ffffff;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
-  box-shadow: 0 4px 10px rgba(170, 59, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(255, 56, 92, 0.15);
+  font-family: var(--font-sans);
 }
 
 .nav-btn:hover {
-  opacity: 0.95;
+  background: #e00b41;
   transform: translateY(-1px);
 }
 
+.nav-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
 .nav-btn.router-link-exact-active {
-  background: var(--accent);
-  color: #fff;
+  background: #ff385c;
+  color: #ffffff;
 }
 
 /* Logout Button */
 .logout-nav-btn {
   background: transparent;
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  padding: 7px 14px;
-  border-radius: 6px;
-  font-size: 14px;
+  color: var(--color-muted);
+  border: 1px solid var(--color-hairline);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s ease;
+  font-family: var(--font-sans);
 }
 
 .logout-nav-btn:hover {
   background: rgba(239, 68, 68, 0.05);
-  border-color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.logout-nav-btn:active {
+  transform: scale(0.98);
 }
 
 /* Notification Styling */
@@ -321,7 +323,7 @@ const handleLogout = () => {
 .notification-bell-btn {
   background: transparent;
   border: none;
-  color: var(--text);
+  color: var(--color-muted);
   cursor: pointer;
   padding: 8px;
   position: relative;
@@ -329,33 +331,32 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .notification-bell-btn:hover {
-  color: var(--text-h);
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-ink);
+  background: var(--color-surface-soft);
 }
 
 .bell-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .badge {
   position: absolute;
   top: 4px;
   right: 4px;
-  background: #ef4444;
+  background: #ff385c;
   color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 10px;
+  border-radius: 9999px;
+  padding: 2px 5px;
+  font-size: 9px;
   font-weight: 700;
   line-height: 1;
-  min-width: 10px;
+  min-width: 8px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .notification-dropdown {
@@ -363,14 +364,12 @@ const handleLogout = () => {
   top: 100%;
   right: 0;
   margin-top: 12px;
-  width: 340px;
+  width: 320px;
   max-height: 420px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03);
+  background: #ffffff;
+  border: 1px solid var(--color-hairline);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   z-index: 1000;
@@ -378,41 +377,42 @@ const handleLogout = () => {
 }
 
 .dropdown-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-hairline);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(0, 0, 0, 0.01);
 }
 
 .dropdown-header h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
 }
 
 .mark-all-btn {
   background: transparent;
   border: none;
-  color: var(--accent);
-  font-size: 12px;
+  color: #ff385c;
+  font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
-  transition: all 0.2s;
+  transition: all 0.15s ease;
+  font-family: var(--font-sans);
 }
 
 .mark-all-btn:hover {
-  background: rgba(170, 59, 255, 0.08);
+  background: rgba(255, 56, 92, 0.06);
 }
 
 .dropdown-body {
   overflow-y: auto;
   flex: 1;
-  max-height: 340px;
+  max-height: 320px;
 }
 
 .dropdown-body::-webkit-scrollbar {
@@ -424,15 +424,16 @@ const handleLogout = () => {
 }
 
 .dropdown-body::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.12);
+  background: var(--color-hairline);
   border-radius: 3px;
 }
 
 .empty-state {
-  padding: 40px 20px;
+  padding: 36px 18px;
   text-align: center;
-  color: #6b7280;
-  font-size: 13.5px;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-family: var(--font-sans);
 }
 
 .notification-list {
@@ -441,13 +442,14 @@ const handleLogout = () => {
 }
 
 .notification-item {
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-hairline-soft);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  text-align: left;
 }
 
 .notification-item:last-child {
@@ -455,15 +457,15 @@ const handleLogout = () => {
 }
 
 .notification-item:hover {
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--color-surface-soft);
 }
 
 .notification-item.unread {
-  background: rgba(170, 59, 255, 0.05);
+  background: rgba(255, 56, 92, 0.03);
 }
 
 .notification-item.unread:hover {
-  background: rgba(170, 59, 255, 0.08);
+  background: rgba(255, 56, 92, 0.06);
 }
 
 .notif-header {
@@ -475,32 +477,34 @@ const handleLogout = () => {
 
 .notif-title {
   font-weight: 700;
-  font-size: 14px;
-  color: #111827;
+  font-size: 13.5px;
+  color: var(--color-ink);
   line-height: 1.3;
+  font-family: var(--font-sans);
 }
 
 .unread-dot {
-  width: 8px;
-  height: 8px;
-  background: var(--accent);
+  width: 6px;
+  height: 6px;
+  background: #ff385c;
   border-radius: 50%;
   flex-shrink: 0;
   margin-top: 5px;
-  box-shadow: 0 0 0 2px #fff;
 }
 
 .notif-message {
   margin: 0;
-  font-size: 13px;
-  color: #4b5563;
-  line-height: 1.45;
+  font-size: 12.5px;
+  color: var(--color-body);
+  line-height: 1.4;
+  font-family: var(--font-sans);
 }
 
 .notif-time {
-  font-size: 11px;
-  color: #6b7280;
+  font-size: 10.5px;
+  color: var(--color-muted);
   align-self: flex-end;
-  margin-top: 2px;
+  margin-top: 1px;
+  font-family: var(--font-sans);
 }
 </style>

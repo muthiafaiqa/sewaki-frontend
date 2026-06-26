@@ -69,14 +69,14 @@ const paginatedItems = computed(() => {
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
-    window.scrollTo({ top: 400, behavior: 'smooth' });
+    window.scrollTo({ top: 300, behavior: 'smooth' });
   }
 };
 
 const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
-    window.scrollTo({ top: 400, behavior: 'smooth' });
+    window.scrollTo({ top: 300, behavior: 'smooth' });
   }
 };
 
@@ -110,10 +110,6 @@ onMounted(() => {
   }
 });
 
-const handleRent = (item) => {
-  router.push(`/katalog/${item.id}`);
-};
-
 const getImageUrl = (filename) => {
   if (!filename) return '';
   if (filename.startsWith('http://') || filename.startsWith('https://')) {
@@ -145,8 +141,8 @@ const navigateToDetail = (itemId) => {
   <div class="home-container">
     <!-- Hero Header -->
     <header class="hero-section">
-      <h1>Temukan & Sewa Barang Kebutuhan Anda</h1>
-      <p class="hero-subtitle">Mulai dari alat berkemah, fotografi, elektronik, hingga pakaian. Lebih hemat sewa dibanding beli.</p>
+      <h1 class="hero-title">Temukan barang sewa terbaik di Makassar</h1>
+      <p class="hero-subtitle">Mulai dari kamera, peralatan outdoor, drone, hingga keperluan acara dengan harga terbaik.</p>
     </header>
 
     <!-- Search Bar Section -->
@@ -161,7 +157,7 @@ const navigateToDetail = (itemId) => {
           v-model="searchQuery" 
           @input="handleSearch" 
           @keydown.enter="handleSearch" 
-          placeholder="Cari barang sewa berdasarkan nama..." 
+          placeholder="Cari kamera, tenda, perlengkapan outdoor..." 
           class="search-input"
         />
         <button v-if="searchQuery" @click="clearSearch" class="clear-search-btn" title="Hapus pencarian">
@@ -178,7 +174,7 @@ const navigateToDetail = (itemId) => {
       <svg class="spinner" viewBox="0 0 50 50">
         <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
       </svg>
-      <p>Memuat daftar barang...</p>
+      <p class="status-text">Memuat daftar barang...</p>
     </div>
 
     <!-- State: Error -->
@@ -191,12 +187,12 @@ const navigateToDetail = (itemId) => {
         </svg>
       </div>
       <h3>Gagal Memuat Data</h3>
-      <p>{{ errorMessage }}</p>
+      <p class="status-subtext">{{ errorMessage }}</p>
       <button @click="fetchItems" class="retry-btn">Coba Lagi</button>
     </div>
 
     <!-- State: Empty Catalog -->
-    <div v-else-if="items.length === 0" class="status-wrapper empty-wrapper">
+    <div v-else-if="filteredItems.length === 0" class="status-wrapper empty-wrapper">
       <div class="empty-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -204,15 +200,20 @@ const navigateToDetail = (itemId) => {
           <line x1="12" y1="22.08" x2="12" y2="12"></line>
         </svg>
       </div>
-      <h3>Belum Ada Barang</h3>
-      <p>Katalog sewa saat ini sedang kosong. Silakan periksa kembali nanti.</p>
+      <h3>Tidak Ada Barang Ditemukan</h3>
+      <p class="status-subtext">Coba kata kunci pencarian yang lain atau periksa kembali nanti.</p>
     </div>
 
     <!-- State: Catalog Grid Loaded -->
     <div v-else class="catalog-section">
       <h2 class="section-title">Katalog Barang Sewa</h2>
       <div class="items-grid">
-        <div v-for="item in paginatedItems" :key="item.id" class="item-card" @click="navigateToDetail(item.id)">
+        <div 
+          v-for="item in paginatedItems" 
+          :key="item.id" 
+          class="item-card" 
+          @click="navigateToDetail(item.id)"
+        >
           <!-- Card Image Wrapper -->
           <div class="card-image-wrapper">
             <img 
@@ -220,24 +221,36 @@ const navigateToDetail = (itemId) => {
               :src="getImageUrl(item.foto_barang)" 
               :alt="item.nama_barang || item.name" 
               class="item-image"
+              loading="lazy"
             />
             <div v-else class="card-image-placeholder">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="box-icon">
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
               </svg>
             </div>
+            
             <span class="category-tag">{{ item.category || 'Barang Sewa' }}</span>
+
+            <!-- Admin Delete Button Overlay -->
+            <button 
+              v-if="currentUser?.role === 'admin'" 
+              @click.stop="handleDelete(item.id)" 
+              class="admin-delete-btn"
+              title="Hapus Barang"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="trash-icon">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
           </div>
 
           <!-- Card Content -->
           <div class="card-content">
             <h3 class="item-title">{{ item.nama_barang || item.name }}</h3>
             
-            <div class="item-price">
-              <span class="price-value">{{ formatPrice(item.harga_sewa_per_hari !== undefined ? item.harga_sewa_per_hari : item.price) }}</span>
-              <span class="price-period">/ hari</span>
-            </div>
-
             <div class="item-info">
               <!-- Location Row -->
               <div class="info-row">
@@ -245,25 +258,18 @@ const navigateToDetail = (itemId) => {
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                <span>{{ item.lokasi || item.location || 'Lokasi tidak ditentukan' }}</span>
+                <span class="info-text">{{ item.lokasi || item.location || 'Makassar' }}</span>
               </div>
               
-              <!-- Owner/Description Row if available -->
+              <!-- Description Row -->
               <div v-if="item.deskripsi || item.description" class="info-row description-row">
                 <p class="description-text">{{ item.deskripsi || item.description }}</p>
               </div>
             </div>
             
-            <div class="card-actions">
-              <button @click.stop="handleRent(item)" class="rent-btn">Pinjam Barang Ini</button>
-              <button 
-                v-if="currentUser?.role === 'admin'" 
-                @click.stop="handleDelete(item.id)" 
-                class="delete-btn"
-                title="Hapus Barang"
-              >
-                Hapus
-              </button>
+            <div class="price-row">
+              <span class="price-value">{{ formatPrice(item.harga_sewa_per_hari !== undefined ? item.harga_sewa_per_hari : item.price) }}</span>
+              <span class="price-period">/ hari</span>
             </div>
           </div>
         </div>
@@ -280,4 +286,3 @@ const navigateToDetail = (itemId) => {
 </template>
 
 <style src="./Home.css" scoped></style>
-

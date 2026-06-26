@@ -1,15 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import Login from '../views/login.vue';
-import Register from '../views/register.vue';
-import Profile from '../views/Profile.vue';
-import TambahBarang from '../views/TambahBarang.vue';
-import AdminKYC from '../views/AdminKYC.vue';
-import AdminDashboard from '../views/AdminDashboard.vue';
-import DetailBarang from '../views/DetailBarang.vue';
-import RiwayatTransaksi from '../views/RiwayatTransaksi.vue';
-import KelolaPesanan from '../views/KelolaPesanan.vue';
-import Dashboard from '../views/Dashboard.vue';
+import Login from '../views/Auth/login/index.vue';
+import Register from '../views/Auth/register/index.vue';
+import Profile from '../views/Profile/index.vue';
+import DetailBarang from '../views/DetailBarang/index.vue';
+
+// Modular views (lazy-loaded)
+const TambahBarang = () => import('../views/TambahBarang/index.vue');
+const AdminKYC = () => import('../views/Admin/KYC/index.vue');
+const AdminDashboard = () => import('../views/Admin/Dashboard/index.vue');
+const RiwayatTransaksi = () => import('../views/RiwayatTransaksi/index.vue');
+const KelolaPesanan = () => import('../views/KelolaPesanan/index.vue');
+const Dashboard = () => import('../views/Dashboard/index.vue');
 
 const routes = [
   {
@@ -26,13 +28,13 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login,
-    meta: { guestOnly: true },
+    meta: { guestOnly: true, hideNavbar: true },
   },
   {
     path: '/register',
     name: 'Register',
     component: Register,
-    meta: { guestOnly: true },
+    meta: { guestOnly: true, hideNavbar: true },
   },
   {
     path: '/profile',
@@ -127,9 +129,9 @@ router.beforeEach((to, from, next) => {
       next();
     }
   } else if (to.matched.some(record => record.meta.guestOnly)) {
-    // Rute hanya untuk tamu (non-login), arahkan ke profil jika sudah terotentikasi
+    // Rute hanya untuk tamu (non-login), arahkan ke beranda jika sudah terotentikasi
     if (isAuthenticated) {
-      next('/profile');
+      next('/');
     } else {
       next();
     }

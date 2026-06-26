@@ -1,0 +1,224 @@
+<template>
+  <div class="min-h-screen bg-canvas flex flex-col md:flex-row">
+    <!-- Left Column: Interactive Activity Collage (Hidden on mobile) -->
+    <div class="hidden md:flex flex-col justify-between w-1/2 p-xl bg-surface-soft border-r border-hairline relative overflow-hidden select-none">
+      <!-- Logo and Intro -->
+      <div class="w-full">
+        <div class="flex items-center gap-xs mb-xl">
+          <span class="font-sans font-extrabold text-2xl tracking-tight text-ink">Sewa<span class="text-[#ff385c]">Ki</span></span>
+        </div>
+        <h1 class="text-3xl lg:text-4xl font-semibold tracking-tight text-ink font-sans mb-sm leading-tight max-w-[420px]">
+          Kelola Persewaan dalam Satu Platform.
+        </h1>
+        <p class="text-sm text-body font-sans leading-relaxed max-w-[380px] mt-xs">
+          Mulai menyewakan barang pribadi Anda atau temukan peralatan terbaik di sekitar Makassar.
+        </p>
+      </div>
+
+      <!-- Collage Cards Container -->
+      <div class="relative w-full h-[360px] my-lg flex items-center justify-center">
+        <!-- Card 1: Active Rental Alert / Transaction Notification -->
+        <div class="bg-canvas border border-hairline shadow-md rounded-lg p-md absolute top-2 left-6 w-[300px] z-20 transform -rotate-1 transition-all duration-300 hover:scale-[1.03] hover:rotate-0 hover:z-30">
+          <div class="flex items-start gap-sm">
+            <div class="w-8 h-8 rounded-full bg-[#ff385c]/10 text-[#ff385c] font-bold text-xs flex items-center justify-center font-sans shrink-0">
+              BS
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-center gap-xs mb-xxs">
+                <span class="font-sans font-bold text-xs text-ink truncate">@budi_s</span>
+                <span class="font-sans text-[9px] text-muted-soft shrink-0">Baru saja</span>
+              </div>
+              <p class="font-sans text-xs text-body leading-normal">
+                Menyewa <span class="font-semibold text-ink">Sony Alpha 7 III</span> selama <span class="font-semibold text-ink">3 hari</span>
+              </p>
+              <div class="mt-xs inline-flex items-center bg-[#10b981]/15 text-[#10b981] text-[10px] font-bold px-2 py-0.5 rounded-full">
+                Disewa
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Mini Calendar Simulator Widget -->
+        <div class="bg-canvas border border-hairline shadow-md rounded-lg p-md absolute top-24 right-6 w-[220px] z-10 transform rotate-3 transition-all duration-300 hover:scale-[1.03] hover:rotate-0 hover:z-30">
+          <h3 class="font-sans font-bold text-xs text-ink text-center mb-xs">Juni 2026</h3>
+          <div class="grid grid-cols-7 gap-y-xxs text-center">
+            <!-- Headers -->
+            <span class="font-sans text-[8px] text-muted font-bold">S</span>
+            <span class="font-sans text-[8px] text-muted font-bold">S</span>
+            <span class="font-sans text-[8px] text-muted font-bold">R</span>
+            <span class="font-sans text-[8px] text-muted font-bold">K</span>
+            <span class="font-sans text-[8px] text-muted font-bold">J</span>
+            <span class="font-sans text-[8px] text-muted font-bold">S</span>
+            <span class="font-sans text-[8px] text-muted font-bold">M</span>
+
+            <!-- Calendar Days Mock -->
+            <span class="font-sans text-[10px] text-muted-soft py-0.5">22</span>
+            <span class="font-sans text-[10px] text-muted-soft py-0.5">23</span>
+            <span class="font-sans text-[10px] text-muted-soft py-0.5">24</span>
+            <span class="font-sans text-[10px] text-muted-soft py-0.5">25</span>
+            <span class="font-sans text-[10px] text-muted-soft py-0.5">26</span>
+            <span class="font-sans text-[10px] text-on-primary bg-[#ff385c] rounded-full font-bold py-0.5">27</span>
+            <span class="font-sans text-[10px] text-on-primary bg-[#ff385c] rounded-full font-bold py-0.5">28</span>
+            
+            <span class="font-sans text-[10px] text-on-primary bg-[#ff385c] rounded-full font-bold py-0.5">29</span>
+            <span class="font-sans text-[10px] text-ink py-0.5">30</span>
+            <span class="font-sans text-[10px] text-ink py-0.5">1</span>
+            <span class="font-sans text-[10px] text-ink py-0.5">2</span>
+            <span class="font-sans text-[10px] text-ink py-0.5">3</span>
+            <span class="font-sans text-[10px] text-ink py-0.5">4</span>
+            <span class="font-sans text-[10px] text-ink py-0.5">5</span>
+          </div>
+          <div class="mt-sm flex items-center justify-between">
+            <span class="font-sans text-[9px] text-muted">Status:</span>
+            <span class="font-sans text-[9px] font-bold text-[#ff385c]">Booked (3 Hari)</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Earning Performance Chart -->
+        <div class="bg-canvas border border-hairline shadow-md rounded-lg p-md absolute bottom-2 left-10 w-[240px] z-15 transform -rotate-2 transition-all duration-300 hover:scale-[1.03] hover:rotate-0 hover:z-30">
+          <div class="flex justify-between items-start mb-sm">
+            <div>
+              <span class="font-sans text-[9px] text-muted uppercase tracking-wider block">Total Pendapatan</span>
+              <span class="font-sans font-extrabold text-base text-ink">Rp 2.450.000</span>
+            </div>
+            <span class="bg-[#10b981]/15 text-[#10b981] text-[9px] font-bold px-1.5 py-0.5 rounded-full inline-flex items-center gap-xxs">
+              +18.4%
+            </span>
+          </div>
+          <!-- Bar Chart Columns Mockup -->
+          <div class="flex items-end gap-sm h-[60px] pt-xs">
+            <div class="flex-1 bg-surface-strong rounded-sm h-[35%]" title="Apr"></div>
+            <div class="flex-1 bg-surface-strong rounded-sm h-[55%]" title="Mei"></div>
+            <div class="flex-1 bg-[#ff385c] rounded-sm h-[90%]" title="Jun"></div>
+          </div>
+          <div class="flex justify-between text-[9px] text-muted-soft font-sans mt-xxs">
+            <span>April</span>
+            <span>Mei</span>
+            <span>Juni</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Auth Form -->
+    <div class="flex flex-col justify-center items-center w-full md:w-1/2 p-lg md:p-xl bg-canvas min-h-screen">
+      <div class="w-full max-w-[380px] flex flex-col justify-center">
+        <!-- Mobile Logo -->
+        <div class="flex md:hidden items-center gap-xs mb-xl">
+          <span class="font-sans font-extrabold text-2xl tracking-tight text-ink">Sewa<span class="text-[#ff385c]">Ki</span></span>
+        </div>
+
+        <div class="mb-xl">
+          <h2 class="text-2xl font-bold text-ink tracking-tight font-sans">Masuk ke Akun Anda</h2>
+          <p class="text-sm text-muted mt-xs font-sans">Silakan masukkan email dan password untuk melanjutkan</p>
+        </div>
+
+        <!-- Alert Box for Error -->
+        <transition name="fade">
+          <div v-if="errorMessage" class="alert-error flex items-start gap-sm bg-error/5 border border-error/20 text-error p-sm rounded-md text-[13px] text-left mb-md">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mt-0.5 shrink-0">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span class="font-sans font-medium">{{ errorMessage }}</span>
+          </div>
+        </transition>
+
+        <!-- Alert Box for Success -->
+        <transition name="fade">
+          <div v-if="successMessage" class="alert-success flex items-start gap-sm bg-success/5 border border-success/20 text-success p-sm rounded-md text-[13px] text-left mb-md">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mt-0.5 shrink-0">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="font-sans font-medium">{{ successMessage }}</span>
+          </div>
+        </transition>
+
+        <LoginForm :loading="isLoading" @submit="handleLogin" />
+
+        <div class="text-left mt-xl pt-md border-t border-hairline">
+          <span class="text-sm text-muted font-sans">Belum punya akun? </span>
+          <router-link to="/register" class="text-sm font-semibold text-[#ff385c] hover:underline font-sans">Daftar sekarang</router-link>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import LoginForm from './components/LoginForm.vue';
+import api from '../../../services/api';
+
+export default {
+  name: 'LoginView',
+  components: {
+    LoginForm,
+  },
+  setup() {
+    const router = useRouter();
+    const isLoading = ref(false);
+    const errorMessage = ref('');
+    const successMessage = ref('');
+
+    const handleLogin = async (formData) => {
+      errorMessage.value = '';
+      successMessage.value = '';
+      isLoading.value = true;
+
+      try {
+        const response = await api.post('/api/auth/login', {
+          email: formData.email,
+          password: formData.password,
+        });
+
+        const token = response.data?.data?.token;
+        if (token) {
+          localStorage.setItem('token', token);
+          const role = response.data?.data?.role || response.data?.role;
+          if (role) {
+            localStorage.setItem('role', role.toLowerCase());
+          }
+          successMessage.value = 'Login berhasil! Mengalihkan...';
+          setTimeout(() => {
+            router.push('/');
+          }, 1000);
+        } else {
+          throw new Error('Token tidak ditemukan dalam respons API');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        if (error.response) {
+          errorMessage.value = error.response.data?.message || error.response.data?.error || 'Login gagal. Silakan periksa kembali email dan password Anda.';
+        } else {
+          errorMessage.value = 'Terjadi kesalahan saat menghubungi server.';
+        }
+      } finally {
+        isLoading.value = false;
+      }
+    };
+
+    return {
+      isLoading,
+      errorMessage,
+      successMessage,
+      handleLogin,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

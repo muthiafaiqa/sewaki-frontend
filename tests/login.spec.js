@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
-import Login from '../src/views/login.vue';
+import Login from '../src/views/Auth/login/index.vue';
 import api from '../src/services/api';
 
 // Mock api
@@ -40,7 +40,7 @@ describe('Login.vue', () => {
     expect(wrapper.find('input#password').exists()).toBe(true);
     
     // Check submit button
-    expect(wrapper.find('button.submit-btn').exists()).toBe(true);
+    expect(wrapper.find('button[type="submit"]').exists()).toBe(true);
   });
 
   // --- Positive Case ---
