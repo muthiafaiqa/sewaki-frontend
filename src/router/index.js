@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../views/Home.vue';
+import LandingPage from '../views/LandingPage.vue';
 import Login from '../views/Auth/login/index.vue';
 import Register from '../views/Auth/register/index.vue';
 import Profile from '../views/Profile/index.vue';
-import DetailBarang from '../views/DetailBarang/index.vue';
+import DetailBarang from '../views/DetailBarang.vue';
 import Katalog from '../views/Katalog/index.vue';
 
 // Modular views (lazy-loaded)
@@ -18,8 +18,9 @@ const Dashboard = () => import('../views/Dashboard/index.vue');
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'LandingPage',
+    component: LandingPage,
+    meta: { hideNavbar: true },
   },
   {
     path: '/katalog',
@@ -108,9 +109,13 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('token');
   const role = (localStorage.getItem('role') || '').toLowerCase();
 
-  // Pengalihan otomatis untuk role owner (pemilik) yang mencoba mengakses beranda utama (/)
-  if (to.path === '/' && isAuthenticated && role === 'pemilik') {
-    next('/dashboard');
+  // Pengalihan otomatis untuk pengguna terotentikasi yang mencoba mengakses beranda utama (/)
+  if (to.path === '/' && isAuthenticated) {
+    if (role === 'pemilik') {
+      next('/dashboard');
+    } else {
+      next('/katalog');
+    }
     return;
   }
 
@@ -152,7 +157,7 @@ router.beforeEach((to, from, next) => {
       if (role === 'pemilik') {
         next('/dashboard');
       } else {
-        next('/');
+        next('/katalog');
       }
     } else {
       next();
