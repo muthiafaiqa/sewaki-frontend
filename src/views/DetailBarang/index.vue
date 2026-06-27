@@ -104,6 +104,7 @@
     <!-- Booking Confirmation Modal -->
     <BookingForm
       :show="showModal"
+      :userProfile="currentUser"
       :itemName="item?.nama_barang || item?.name"
       :todayStr="todayStr"
       :startDate="startDate"

@@ -80,20 +80,11 @@ const prevPage = () => {
   }
 };
 
-const handleSearch = (event) => {
-  if (searchTimeout) clearTimeout(searchTimeout);
-  if (event && event.key === 'Enter') {
-    currentPage.value = 1;
-  } else {
-    searchTimeout = setTimeout(() => {
-      currentPage.value = 1;
-    }, 300);
-  }
-};
-
-const clearSearch = () => {
-  searchQuery.value = '';
-  currentPage.value = 1;
+const handleSearchRedirect = () => {
+  router.push({
+    path: '/katalog',
+    query: searchQuery.value ? { search: searchQuery.value } : {}
+  });
 };
 
 const currentUser = ref(null);
@@ -146,7 +137,7 @@ const navigateToDetail = (itemId) => {
     </header>
 
     <!-- Search Bar Section -->
-    <div class="search-section">
+    <div class="search-section" @click="handleSearchRedirect">
       <div class="search-wrapper">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
           <circle cx="11" cy="11" r="8"></circle>
@@ -155,12 +146,11 @@ const navigateToDetail = (itemId) => {
         <input 
           type="text" 
           v-model="searchQuery" 
-          @input="handleSearch" 
-          @keydown.enter="handleSearch" 
+          @keydown.enter="handleSearchRedirect" 
           placeholder="Cari kamera, tenda, perlengkapan outdoor..." 
           class="search-input"
         />
-        <button v-if="searchQuery" @click="clearSearch" class="clear-search-btn" title="Hapus pencarian">
+        <button v-if="searchQuery" @click.stop="searchQuery = ''" class="clear-search-btn" title="Hapus pencarian">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="clear-icon">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>

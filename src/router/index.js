@@ -4,6 +4,7 @@ import Login from '../views/Auth/login/index.vue';
 import Register from '../views/Auth/register/index.vue';
 import Profile from '../views/Profile/index.vue';
 import DetailBarang from '../views/DetailBarang/index.vue';
+import Katalog from '../views/Katalog/index.vue';
 
 // Modular views (lazy-loaded)
 const TambahBarang = () => import('../views/TambahBarang/index.vue');
@@ -18,6 +19,11 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+  },
+  {
+    path: '/katalog',
+    name: 'Katalog',
+    component: Katalog,
   },
   {
     path: '/katalog/:id',

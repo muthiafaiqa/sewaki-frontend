@@ -192,6 +192,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    userProfile: {
+      type: Object,
+      default: null,
+    },
   },
   emits: ['close', 'update-dates', 'submit'],
   setup(props, { emit }) {
@@ -200,6 +204,38 @@ export default {
     const localBank = ref('BCA');
     const localRekening = ref('');
     const localNamaRekening = ref('');
+
+    const populateDefaultBankDetails = () => {
+      let bankVal = props.userProfile?.bank_default || props.userProfile?.default_bank;
+      let rekeningVal = props.userProfile?.rekening_default || props.userProfile?.default_rekening;
+      let namaRekeningVal = props.userProfile?.nama_rekening_default || props.userProfile?.default_nama_rekening;
+
+      if (!bankVal) bankVal = localStorage.getItem('default_bank');
+      if (!rekeningVal) rekeningVal = localStorage.getItem('default_rekening');
+      if (!namaRekeningVal) namaRekeningVal = localStorage.getItem('default_nama_rekening');
+
+      if (bankVal) {
+        localBank.value = bankVal;
+      }
+      if (rekeningVal) {
+        localRekening.value = rekeningVal;
+      }
+      if (namaRekeningVal) {
+        localNamaRekening.value = namaRekeningVal;
+      }
+    };
+
+    watch(() => props.show, (newVal) => {
+      if (newVal) {
+        populateDefaultBankDetails();
+      }
+    });
+
+    watch(() => props.userProfile, () => {
+      if (props.show) {
+        populateDefaultBankDetails();
+      }
+    }, { deep: true });
 
     watch(() => props.startDate, (val) => { localStartDate.value = val; });
     watch(() => props.endDate, (val) => { localEndDate.value = val; });
