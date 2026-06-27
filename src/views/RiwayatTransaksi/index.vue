@@ -9,15 +9,15 @@
     <BaseSpinner v-if="isLoading" />
 
     <!-- Error State -->
-    <div v-else-if="errorMessage" class="error-wrapper text-center py-xl">
+    <div v-else-if="errorMessage" class="text-center py-xl">
       <h3 class="title-sm text-error">Gagal Memuat Riwayat</h3>
       <p class="body-md text-muted mt-sm mb-md">{{ errorMessage }}</p>
       <BaseButton variant="primary" @click="fetchTransactions">Coba Lagi</BaseButton>
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="transactions.length === 0" class="empty-wrapper text-center py-xl">
-      <div class="empty-icon mb-sm">🗂️</div>
+    <div v-else-if="transactions.length === 0" class="text-center py-xl bg-surface-soft border border-dashed border-hairline rounded-lg">
+      <div class="text-[40px] mb-sm">🗂️</div>
       <h3 class="title-sm text-ink font-bold">Belum Ada Transaksi</h3>
       <p class="body-md text-muted mt-xxs mb-md">Anda belum pernah melakukan transaksi penyewaan barang apapun.</p>
       <BaseButton variant="primary" @click="$router.push('/')">Mulai Sewa Sekarang</BaseButton>
@@ -32,8 +32,19 @@
         :isReviewed="isReviewed(tx.id)"
         @return="openReturnModal"
         @review="openReviewModal"
+        @expired="handleTransactionExpired"
+        @dispute="openDisputeModal"
       />
     </div>
+
+    <!-- Dispute Complaint Modal -->
+    <DisputeModal
+      :show="showDisputeModal"
+      :transaction="selectedDisputeTx"
+      :isLoading="isSubmittingDispute"
+      @close="closeDisputeModal"
+      @submit="handleDisputeSubmit"
+    />
 
     <!-- Return Proof Modal -->
     <BaseModal :show="showReturnModal" @close="closeReturnModal">
@@ -46,7 +57,7 @@
           Silakan unggah foto bukti bahwa barang telah dikembalikan (misalnya foto resi pengiriman atau foto serah terima barang).
         </p>
 
-        <div v-if="uploadError" class="alert-error p-sm mb-xs">{{ uploadError }}</div>
+        <div v-if="uploadError" class="bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.2)] text-error rounded-md text-[13px] p-sm mb-xs">{{ uploadError }}</div>
 
         <KTPUpload v-model="localFile" label="Pilih Foto Bukti" />
       </div>
@@ -75,16 +86,16 @@
       <div class="p-sm text-left flex flex-col gap-sm">
         <h4 class="font-semibold text-ink body-md">{{ reviewTx?.item?.nama_barang || 'Barang' }}</h4>
 
-        <div v-if="reviewError" class="alert-error p-sm mb-xs">{{ reviewError }}</div>
+        <div v-if="reviewError" class="bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.2)] text-error rounded-md text-[13px] p-sm mb-xs">{{ reviewError }}</div>
 
         <div class="form-group flex flex-col gap-xxs">
-          <label class="input-label">Pilih Rating</label>
+          <label class="font-sans text-[14px] font-medium text-ink block">Pilih Rating</label>
           <div class="stars-container flex gap-xs">
             <span 
               v-for="star in 5" 
               :key="star" 
               class="star-item cursor-pointer text-xl"
-              :class="{ 'text-yellow': star <= reviewRating, 'text-muted': star > reviewRating }"
+              :class="{ 'text-warning': star <= reviewRating, 'text-hairline': star > reviewRating }"
               @click="reviewRating = star"
             >
               ★
@@ -93,13 +104,13 @@
         </div>
 
         <div class="form-group flex flex-col gap-xxs">
-          <label for="review_comment" class="input-label">Komentar / Ulasan</label>
+          <label for="review_comment" class="font-sans text-[14px] font-medium text-ink block">Komentar / Ulasan</label>
           <textarea 
             id="review_comment" 
             v-model="reviewComment" 
             placeholder="Ceritakan pengalaman Anda menyewa barang ini..." 
             rows="4"
-            class="textarea-custom"
+            class="w-full p-sm border border-hairline rounded-md bg-canvas text-ink font-sans text-[14px] outline-none box-border resize-y focus:border-primary"
           ></textarea>
         </div>
       </div>
@@ -127,6 +138,7 @@ import PageWrapper from '../../components/layout/PageWrapper.vue';
 import BaseSpinner from '../../components/ui/BaseSpinner.vue';
 import BaseButton from '../../components/ui/BaseButton.vue';
 import BaseModal from '../../components/ui/BaseModal.vue';
+import DisputeModal from '../../components/ui/DisputeModal.vue';
 import KTPUpload from '../Auth/register/components/KTPUpload.vue';
 import TransaksiCard from './components/TransaksiCard.vue';
 import useRiwayat from './composables/useRiwayat';
@@ -138,6 +150,7 @@ export default {
     BaseSpinner,
     BaseButton,
     BaseModal,
+    DisputeModal,
     KTPUpload,
     TransaksiCard,
   },
@@ -157,6 +170,12 @@ export default {
       reviewTx,
       isSubmittingReview,
       reviewError,
+      showDisputeModal,
+      selectedDisputeTx,
+      isSubmittingDispute,
+      openDisputeModal,
+      closeDisputeModal,
+      handleDisputeSubmit,
       isReviewed,
       openReviewModal,
       closeReviewModal,
@@ -165,6 +184,8 @@ export default {
       closeReturnModal,
       handleFileChange,
       handleUploadProof,
+      handleTransactionExpired,
+      fetchTransactions,
     } = useRiwayat();
 
     watch(localFile, (val) => {
@@ -184,6 +205,12 @@ export default {
       reviewTx,
       isSubmittingReview,
       reviewError,
+      showDisputeModal,
+      selectedDisputeTx,
+      isSubmittingDispute,
+      openDisputeModal,
+      closeDisputeModal,
+      handleDisputeSubmit,
       localFile,
       isReviewed,
       openReviewModal,
@@ -192,61 +219,9 @@ export default {
       openReturnModal,
       closeReturnModal,
       handleUploadProof,
+      handleTransactionExpired,
+      fetchTransactions,
     };
   },
 };
 </script>
-
-<style scoped>
-.empty-wrapper {
-  background-color: var(--color-surface-soft);
-  border: 1px dashed var(--color-hairline);
-  border-radius: var(--rounded-lg);
-}
-
-.empty-icon {
-  font-size: 40px;
-}
-
-.alert-error {
-  background-color: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: var(--color-error);
-  border-radius: var(--rounded-md);
-  font-size: 13px;
-}
-
-.text-yellow {
-  color: var(--color-warning);
-}
-
-.text-muted {
-  color: var(--color-hairline);
-}
-
-.textarea-custom {
-  width: 100%;
-  padding: var(--spacing-sm);
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--rounded-md);
-  background-color: var(--color-canvas);
-  color: var(--color-ink);
-  font-family: inherit;
-  font-size: 14px;
-  outline: none;
-  box-sizing: border-box;
-  resize: vertical;
-}
-
-.textarea-custom:focus {
-  border-color: var(--color-primary);
-}
-
-.input-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-ink);
-  display: block;
-}
-</style>

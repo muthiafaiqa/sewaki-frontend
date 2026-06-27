@@ -115,7 +115,14 @@
         </div>
 
         <!-- Alert Box for Error -->
-        <transition name="fade">
+        <transition 
+          enter-active-class="transition-opacity duration-200 ease-out"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition-opacity duration-200 ease-in"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
+        >
           <div v-if="errorMessage" class="alert-error flex items-start gap-sm bg-error/5 border border-error/20 text-error p-sm rounded-md text-[13px] text-left mb-md">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mt-0.5 shrink-0">
               <circle cx="12" cy="12" r="10"></circle>
@@ -127,7 +134,14 @@
         </transition>
 
         <!-- Alert Box for Success -->
-        <transition name="fade">
+        <transition 
+          enter-active-class="transition-opacity duration-200 ease-out"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition-opacity duration-200 ease-in"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
+        >
           <div v-if="successMessage" class="alert-success flex items-start gap-sm bg-success/5 border border-success/20 text-success p-sm rounded-md text-[13px] text-left mb-md">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mt-0.5 shrink-0">
               <polyline points="20 6 9 17 4 12"></polyline>
@@ -210,15 +224,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

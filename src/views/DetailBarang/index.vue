@@ -1,9 +1,9 @@
 <template>
-  <div class="detail-container">
+  <div class="max-w-[1120px] mx-auto px-[24px] pt-[32px] pb-[80px] box-border">
     <!-- Back to catalog -->
-    <div class="back-nav-wrapper">
-      <router-link to="/" class="back-link">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="arrow-icon">
+    <div class="mb-[24px] text-left">
+      <router-link to="/" class="inline-flex items-center gap-[8px] text-[14px] font-semibold text-muted no-underline transition-colors duration-150 ease-in-out font-sans hover:text-ink">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-[14px] h-[14px]">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
@@ -12,49 +12,47 @@
     </div>
 
     <!-- Spinner State -->
-    <div v-if="isLoading" class="status-wrapper">
-      <svg class="spinner" viewBox="0 0 50 50">
-        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-      </svg>
-      <p class="status-text">Memuat rincian barang...</p>
+    <div v-if="isLoading" class="flex flex-col items-center justify-center min-h-[360px] text-center text-muted gap-[16px]">
+      <BaseSpinner />
+      <p class="font-sans text-[14px]">Memuat rincian barang...</p>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="errorMessage || !item" class="status-wrapper error-wrapper">
-      <div class="error-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div v-else-if="errorMessage || !item" class="flex flex-col items-center justify-center min-h-[360px] text-center text-muted gap-[16px]">
+      <div class="w-[56px] h-[56px] flex items-center justify-center rounded-full text-[#ef4444] bg-[rgba(239,68,68,0.08)]">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
       </div>
-      <h3>Gagal Memuat Rincian</h3>
-      <p class="status-subtext">{{ errorMessage || 'Barang tidak ditemukan.' }}</p>
-      <BaseButton variant="primary" class="retry-btn mt-md" @click="fetchItemDetails">
+      <h3 class="font-sans text-[18px] color-ink font-bold m-0">Gagal Memuat Rincian</h3>
+      <p class="font-sans text-[14px] text-muted-soft max-w-[320px] mx-auto leading-[1.4]">{{ errorMessage || 'Barang tidak ditemukan.' }}</p>
+      <BaseButton variant="primary" class="py-[10px] px-[20px] bg-ink text-canvas border-none rounded-[6px] font-semibold font-sans text-[13.5px] cursor-pointer transition-opacity duration-200 hover:opacity-90 mt-md" @click="fetchItemDetails">
         Coba Lagi
       </BaseButton>
     </div>
 
     <!-- Main Content Grid -->
-    <div v-else class="detail-content-layout">
+    <div v-else class="flex flex-col">
       <!-- Title Section -->
-      <header class="detail-header">
-        <span class="category-tag-header">{{ item.category || 'Barang Sewa' }}</span>
-        <h1 class="item-main-title">{{ item.nama_barang || item.name }}</h1>
-        <div class="item-quick-meta">
-          <span class="meta-rating">★ {{ averageRating }}</span>
-          <span class="meta-divider">•</span>
-          <span class="meta-location">{{ item.lokasi || item.location || 'Makassar' }}</span>
+      <header class="text-left mb-[28px]">
+        <span class="text-[10px] font-bold uppercase tracking-[0.05em] text-[#ff385c] font-sans">{{ item.category || 'Barang Sewa' }}</span>
+        <h1 class="text-[28px] font-extrabold text-ink mt-[4px] mr-0 mb-[6px] ml-0 tracking-[-0.02em] font-sans leading-[1.25]">{{ item.nama_barang || item.name }}</h1>
+        <div class="flex items-center gap-[6px] text-[13.5px] font-medium text-muted font-sans">
+          <span class="text-ink font-semibold">★ {{ averageRating }}</span>
+          <span class="text-hairline">•</span>
+          <span>{{ item.lokasi || item.location || 'Makassar' }}</span>
         </div>
       </header>
 
-      <div class="detail-grid">
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_340px] gap-[32px] md:gap-[48px]">
         <!-- Left Column: Media & Specifications -->
-        <div class="left-column">
+        <div class="flex flex-col gap-[28px]">
           <ItemGallery :foto="item.foto_barang" :alt="item.nama_barang || item.name" />
           
           <!-- Host Card placed Airbnb-style below gallery -->
-          <div class="owner-section-wrapper">
+          <div class="mb-[-8px]">
             <OwnerCard :owner="item.Pemilik || item.pemilik || item.User || item.user" @chat="hubungiPemilik" />
           </div>
 
@@ -73,29 +71,29 @@
         </div>
 
         <!-- Right Column: Sticky Booking Widget Sidebar -->
-        <div class="right-column">
-          <div class="booking-sticky-card">
-            <div class="booking-price-header">
-              <span class="booking-price">{{ formatPrice(pricePerDay) }}</span>
-              <span class="booking-period">/ hari</span>
+        <div class="relative order-first md:order-last">
+          <div class="static md:sticky md:top-[96px] bg-white border border-hairline rounded-[16px] p-[24px] shadow-none md:shadow-[0_6px_16px_rgba(0,0,0,0.06)] text-left box-border">
+            <div class="flex items-baseline gap-[4px] mb-[20px]">
+              <span class="text-[22px] font-bold text-ink font-sans">{{ formatPrice(pricePerDay) }}</span>
+              <span class="text-[13.5px] text-muted font-sans">/ hari</span>
             </div>
             
-            <div class="booking-summary-specs">
-              <div class="summary-row">
-                <span class="summary-label">Stok Tersedia</span>
-                <span class="summary-val">{{ item.stok !== undefined ? item.stok : (item.stock || 1) }} unit</span>
+            <div class="border border-hairline rounded-[8px] mb-[20px] overflow-hidden">
+              <div class="flex justify-between py-[12px] px-[16px] text-[13px] font-sans border-b border-hairline last:border-b-0">
+                <span class="text-muted font-medium">Stok Tersedia</span>
+                <span class="text-ink font-bold">{{ item.stok !== undefined ? item.stok : (item.stock || 1) }} unit</span>
               </div>
-              <div class="summary-row">
-                <span class="summary-label">Jaminan Deposit</span>
-                <span class="summary-val">{{ formatPrice(depositAmount) }}</span>
+              <div class="flex justify-between py-[12px] px-[16px] text-[13px] font-sans border-b border-hairline last:border-b-0">
+                <span class="text-muted font-medium">Jaminan Deposit</span>
+                <span class="text-ink font-bold">{{ formatPrice(depositAmount) }}</span>
               </div>
             </div>
 
-            <button class="booking-primary-btn" @click="showModal = true">
+            <button class="w-full p-[14px] bg-[#ff385c] text-white border-none rounded-[8px] text-[14.5px] font-bold font-sans cursor-pointer transition-all duration-150 ease-in-out text-center shadow-[0_2px_8px_rgba(255,56,92,0.15)] hover:bg-[#e00b41] hover:-translate-y-[1px] active:translate-y-0 active:scale-[0.98]" @click="showModal = true">
               Pinjam Barang Ini Sekarang
             </button>
             
-            <p class="booking-card-subtext">Refund deposit jaminan diproses otomatis setelah masa sewa berakhir.</p>
+            <p class="text-[11.5px] text-muted-soft text-center mt-[12px] mr-0 mb-0 ml-0 leading-[1.4] font-sans">Refund deposit jaminan diproses otomatis setelah masa sewa berakhir.</p>
           </div>
         </div>
       </div>
@@ -127,6 +125,7 @@
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import BaseButton from '../../components/ui/BaseButton.vue';
+import BaseSpinner from '../../components/ui/BaseSpinner.vue';
 import ItemGallery from './components/ItemGallery.vue';
 import ItemInfo from './components/ItemInfo.vue';
 import BookingForm from './components/BookingForm.vue';
@@ -137,6 +136,7 @@ export default {
   name: 'DetailBarangView',
   components: {
     BaseButton,
+    BaseSpinner,
     ItemGallery,
     ItemInfo,
     BookingForm,
@@ -240,318 +240,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.detail-container {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 32px 24px 80px 24px;
-  box-sizing: border-box;
-}
-
-/* Back Link styling */
-.back-nav-wrapper {
-  margin-bottom: 24px;
-  text-align: left;
-}
-
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-muted);
-  text-decoration: none;
-  transition: color 0.15s ease;
-  font-family: var(--font-sans);
-}
-
-.back-link:hover {
-  color: var(--color-ink);
-}
-
-.arrow-icon {
-  width: 14px;
-  height: 14px;
-}
-
-/* Header Section */
-.detail-header {
-  text-align: left;
-  margin-bottom: 28px;
-}
-
-.category-tag-header {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #ff385c;
-  font-family: var(--font-sans);
-}
-
-.item-main-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--color-ink);
-  margin: 4px 0 6px 0;
-  letter-spacing: -0.02em;
-  font-family: var(--font-sans);
-  line-height: 1.25;
-}
-
-.item-quick-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--color-muted);
-  font-family: var(--font-sans);
-}
-
-.meta-rating {
-  color: var(--color-ink);
-  font-weight: 600;
-}
-
-.meta-divider {
-  color: var(--color-hairline);
-}
-
-/* Split Grid */
-.detail-content-layout {
-  display: flex;
-  flex-direction: column;
-}
-
-.detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 48px;
-}
-
-.left-column {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-}
-
-.right-column {
-  position: relative;
-}
-
-/* Owner Section layout spacing */
-.owner-section-wrapper {
-  margin-bottom: -8px;
-}
-
-/* Sticky Booking Card */
-.booking-sticky-card {
-  position: sticky;
-  top: 96px;
-  background: #ffffff;
-  border: 1px solid var(--color-hairline);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-  text-align: left;
-  box-sizing: border-box;
-}
-
-.booking-price-header {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  margin-bottom: 20px;
-}
-
-.booking-price {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-}
-
-.booking-period {
-  font-size: 13.5px;
-  color: var(--color-muted);
-  font-family: var(--font-sans);
-}
-
-.booking-summary-specs {
-  border: 1px solid var(--color-hairline);
-  border-radius: 8px;
-  margin-bottom: 20px;
-  overflow: hidden;
-}
-
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 16px;
-  font-size: 13px;
-  font-family: var(--font-sans);
-  border-bottom: 1px solid var(--color-hairline);
-}
-
-.summary-row:last-child {
-  border-bottom: none;
-}
-
-.summary-label {
-  color: var(--color-muted);
-  font-weight: 500;
-}
-
-.summary-val {
-  color: var(--color-ink);
-  font-weight: 600;
-}
-
-.booking-primary-btn {
-  width: 100%;
-  padding: 14px;
-  background: #ff385c;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 14.5px;
-  font-weight: 700;
-  font-family: var(--font-sans);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(255, 56, 92, 0.15);
-}
-
-.booking-primary-btn:hover {
-  background: #e00b41;
-  transform: translateY(-1px);
-}
-
-.booking-primary-btn:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.booking-card-subtext {
-  font-size: 11.5px;
-  color: var(--color-muted-soft);
-  text-align: center;
-  margin: 12px 0 0 0;
-  line-height: 1.4;
-  font-family: var(--font-sans);
-}
-
-/* Spinner State styling */
-.status-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 360px;
-  text-align: center;
-  color: var(--color-muted);
-  gap: 16px;
-}
-
-.status-text {
-  font-family: var(--font-sans);
-  font-size: 14px;
-}
-
-.status-subtext {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  color: var(--color-muted-soft);
-  max-width: 320px;
-  margin: 0 auto;
-  line-height: 1.4;
-}
-
-.spinner {
-  animation: rotate 2s linear infinite;
-  width: 36px;
-  height: 36px;
-}
-
-.spinner .path {
-  stroke: var(--color-ink);
-  stroke-linecap: round;
-  animation: dash 1.5s ease-in-out infinite;
-}
-
-@keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes dash {
-  0% {
-    stroke-dasharray: 1, 150;
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -35;
-  }
-  100% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -124;
-  }
-}
-
-.error-icon {
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.08);
-}
-
-.status-wrapper h3 {
-  font-family: var(--font-sans);
-  font-size: 18px;
-  color: var(--color-ink);
-  margin: 0;
-  font-weight: 700;
-}
-
-.retry-btn {
-  padding: 10px 20px;
-  background: var(--color-ink);
-  color: var(--color-canvas);
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  font-family: var(--font-sans);
-  font-size: 13.5px;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.retry-btn:hover {
-  opacity: 0.9;
-}
-
-/* Responsiveness */
-@media (max-width: 768px) {
-  .detail-grid {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-  .right-column {
-    order: -1; /* Display booking card at top on mobile */
-  }
-  .booking-sticky-card {
-    position: static;
-    box-shadow: none;
-    border: 1px solid var(--color-hairline);
-  }
-}
-</style>

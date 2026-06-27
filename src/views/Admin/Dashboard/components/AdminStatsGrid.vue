@@ -1,18 +1,18 @@
 <template>
-  <div class="revenue-card-container">
-    <div class="revenue-flex-layout">
+  <div class="w-full py-[20px] px-[24px] bg-surface-soft border border-hairline rounded-[16px] shadow-[0_4px_12px_rgba(0,0,0,0.02)] mb-[28px] box-border">
+    <div class="flex items-center gap-[16px] text-left">
       <!-- Icon Wrapper -->
-      <div class="revenue-icon-wrapper">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="revenue-svg-icon">
+      <div class="w-[44px] h-[44px] rounded-[10px] bg-[rgba(16,185,129,0.08)] text-[#10b981] flex items-center justify-center shrink-0 border border-[rgba(16,185,129,0.15)]">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-[20px] h-[20px]">
           <line x1="12" y1="1" x2="12" y2="23"></line>
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
         </svg>
       </div>
       
       <!-- Info Details -->
-      <div class="revenue-meta-details">
-        <span class="revenue-label">Total Pendapatan Platform</span>
-        <span class="revenue-value">{{ formatPrice(totalPendapatan) }}</span>
+      <div class="flex flex-col">
+        <span class="text-[11.5px] font-bold uppercase tracking-[0.05em] text-muted font-sans">Total Pendapatan Platform</span>
+        <span class="text-[22px] font-extrabold text-ink mt-[2px] font-sans tracking-[-0.01em]">{{ formatPrice(totalPendapatan) }}</span>
       </div>
     </div>
   </div>
@@ -43,64 +43,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.revenue-card-container {
-  width: 100%;
-  padding: 20px 24px;
-  background: var(--color-surface-soft);
-  border: 1px solid var(--color-hairline);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-  margin-bottom: 28px;
-  box-sizing: border-box;
-}
-
-.revenue-flex-layout {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  text-align: left;
-}
-
-.revenue-icon-wrapper {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background-color: rgba(16, 185, 129, 0.08);
-  color: #10b981;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 1px solid rgba(16, 185, 129, 0.15);
-}
-
-.revenue-svg-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.revenue-meta-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.revenue-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-muted);
-  font-family: var(--font-sans);
-}
-
-.revenue-value {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--color-ink);
-  margin-top: 2px;
-  font-family: var(--font-sans);
-  letter-spacing: -0.01em;
-}
-</style>

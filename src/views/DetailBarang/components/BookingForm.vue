@@ -1,14 +1,14 @@
 <template>
   <BaseModal :show="show" @close="$emit('close')">
     <template #header>
-      <h3 class="modal-main-title">Konfirmasi Penyewaan</h3>
+      <h3 class="text-[18px] font-extrabold text-ink font-sans m-0 tracking-[-0.01em]">Konfirmasi Penyewaan</h3>
     </template>
 
-    <div class="booking-modal-body">
-      <h4 class="item-name-heading">{{ itemName }}</h4>
+    <div class="py-[8px] px-0 text-left">
+      <h4 class="text-[15px] font-bold text-ink mb-[16px] font-sans">{{ itemName }}</h4>
 
       <!-- Date Pickers Grid -->
-      <div class="date-pickers-layout">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-[12px] sm:gap-[16px] mb-[16px]">
         <BaseInput
           id="startDate"
           type="date"
@@ -32,8 +32,8 @@
       </div>
 
       <!-- Warning if invalid dates -->
-      <div v-if="durationDays <= 0" class="date-warning-card">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="warning-icon">
+      <div v-if="durationDays <= 0" class="flex items-center gap-[10px] p-[14px_16px] bg-[rgba(239,68,68,0.06)] border border-[rgba(239,68,68,0.15)] rounded-[10px] text-[#ef4444] text-[13px] font-semibold font-sans">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4 shrink-0">
           <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
           <line x1="12" y1="9" x2="12" y2="13"></line>
           <line x1="12" y1="17" x2="12.01" y2="17"></line>
@@ -42,39 +42,39 @@
       </div>
 
       <!-- Price Breakdown Receipt -->
-      <div v-else class="receipt-card-layout">
-        <h4 class="receipt-title">Rincian Biaya</h4>
-        <div class="receipt-items-list">
-          <div class="receipt-item-row">
-            <span class="receipt-lbl">Harga Sewa ({{ formatPrice(pricePerDay) }} × {{ durationDays }} hari)</span>
-            <span class="receipt-val">{{ formatPrice(totalRent) }}</span>
+      <div v-else class="bg-surface-soft border border-hairline rounded-[12px] p-[16px] mb-[24px]">
+        <h4 class="text-[13.5px] font-bold text-ink mb-[12px] font-sans">Rincian Biaya</h4>
+        <div class="flex flex-col gap-[8px]">
+          <div class="flex justify-between items-center text-[13px] font-sans">
+            <span class="text-muted font-medium">Harga Sewa ({{ formatPrice(pricePerDay) }} × {{ durationDays }} hari)</span>
+            <span class="text-ink font-bold">{{ formatPrice(totalRent) }}</span>
           </div>
-          <div class="receipt-item-row">
-            <span class="receipt-lbl">Jaminan Deposit (Refundable)</span>
-            <span class="receipt-val">{{ formatPrice(depositAmount) }}</span>
+          <div class="flex justify-between items-center text-[13px] font-sans">
+            <span class="text-muted font-medium">Jaminan Deposit (Refundable)</span>
+            <span class="text-ink font-bold">{{ formatPrice(depositAmount) }}</span>
           </div>
-          <div class="receipt-item-row">
-            <span class="receipt-lbl">Biaya Admin</span>
-            <span class="receipt-val">{{ formatPrice(adminFee) }}</span>
+          <div class="flex justify-between items-center text-[13px] font-sans">
+            <span class="text-muted font-medium">Biaya Admin</span>
+            <span class="text-ink font-bold">{{ formatPrice(adminFee) }}</span>
           </div>
-          <hr class="receipt-line-divider" />
-          <div class="receipt-item-row grand-total-row">
-            <span class="total-lbl">Total Tagihan</span>
-            <span class="total-val">{{ formatPrice(grandTotal) }}</span>
+          <hr class="border-0 border-t border-hairline my-[4px]" />
+          <div class="flex justify-between items-center text-[14.5px] font-bold mt-[2px]">
+            <span class="text-ink">Total Tagihan</span>
+            <span class="text-ink">{{ formatPrice(grandTotal) }}</span>
           </div>
         </div>
       </div>
 
       <!-- Bank Refund Form -->
-      <div v-if="durationDays > 0" class="bank-refund-form">
-        <h4 class="bank-section-title">Rekening Pengembalian Deposit</h4>
-        <p class="bank-section-subtitle">Dana jaminan didepositkan kembali secara otomatis ke rekening ini.</p>
+      <div v-if="durationDays > 0" class="border-t border-hairline pt-[20px]">
+        <h4 class="text-[14.5px] font-bold text-ink m-0 font-sans">Rekening Pengembalian Deposit</h4>
+        <p class="text-[12px] text-muted mt-[4px] mr-0 mb-[16px] ml-0 font-sans leading-[1.4]">Dana jaminan didepositkan kembali secara otomatis ke rekening ini.</p>
 
-        <div class="bank-inputs-stack">
-          <div class="form-group-select">
-            <label for="bankSelect" class="select-label">Nama Bank Tujuan</label>
-            <div class="select-wrapper">
-              <select id="bankSelect" v-model="localBank" class="select-custom">
+        <div class="flex flex-col gap-[16px]">
+          <div class="flex flex-col gap-[6px]">
+            <label for="bankSelect" class="text-[13px] font-semibold text-ink font-sans text-left">Nama Bank Tujuan</label>
+            <div class="relative w-full">
+              <select id="bankSelect" v-model="localBank" class="w-full h-[52px] pr-[40px] pl-[16px] border border-hairline rounded-[8px] bg-canvas text-ink font-sans text-[14.5px] font-medium outline-none cursor-pointer appearance-none box-border transition-colors duration-150 ease-in-out focus:border-ink focus:border-2">
                 <option value="BCA">BCA</option>
                 <option value="BNI">BNI</option>
                 <option value="MANDIRI">MANDIRI</option>
@@ -83,8 +83,8 @@
                 <option value="OVO">OVO</option>
                 <option value="GOPAY">GOPAY</option>
               </select>
-              <div class="select-arrow-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down">
+              <div class="absolute top-1/2 right-[16px] -translate-y-1/2 text-muted pointer-events-none flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[18px] h-[18px]">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </div>
@@ -115,12 +115,12 @@
     </div>
 
     <template #footer>
-      <div class="modal-footer-actions">
-        <button class="btn-modal-cancel" @click="$emit('close')" :disabled="submitting">
+      <div class="flex items-center justify-end gap-[12px] w-full">
+        <button class="py-[12px] px-[24px] bg-transparent border border-hairline rounded-[8px] text-[14px] font-semibold text-muted cursor-pointer transition-all duration-150 ease-in-out font-sans hover:bg-surface-soft hover:text-ink hover:border-muted-soft" @click="$emit('close')" :disabled="submitting">
           Batal
         </button>
         <button 
-          class="btn-modal-submit"
+          class="py-[12px] px-[24px] bg-[#ff385c] border-none rounded-[8px] text-[14px] font-bold text-white cursor-pointer transition-all duration-150 ease-in-out font-sans shadow-[0_2px_8px_rgba(255,56,92,0.15)] hover:not-disabled:bg-[#e00b41] hover:not-disabled:-translate-y-[1px] active:not-disabled:translate-y-0 active:not-disabled:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           :disabled="durationDays <= 0 || submitting" 
           @click="handleSubmit"
         >
@@ -280,268 +280,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.modal-main-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-
-.booking-modal-body {
-  padding: 8px 0;
-  text-align: left;
-}
-
-.item-name-heading {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-ink);
-  margin: 0 0 16px 0;
-  font-family: var(--font-sans);
-}
-
-.date-pickers-layout {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-@media (max-width: 480px) {
-  .date-pickers-layout {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-/* Date warning styling */
-.date-warning-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  background: rgba(239, 68, 68, 0.06);
-  border: 1px solid rgba(239, 68, 68, 0.15);
-  border-radius: 10px;
-  color: #ef4444;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: var(--font-sans);
-}
-
-.warning-icon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-}
-
-/* Price Breakdown Receipt */
-.receipt-card-layout {
-  background: var(--color-surface-soft);
-  border: 1px solid var(--color-hairline);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
-}
-
-.receipt-title {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--color-ink);
-  margin: 0 0 12px 0;
-  font-family: var(--font-sans);
-}
-
-.receipt-items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.receipt-item-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  font-family: var(--font-sans);
-}
-
-.receipt-lbl {
-  color: var(--color-muted);
-  font-weight: 500;
-}
-
-.receipt-val {
-  color: var(--color-ink);
-  font-weight: 600;
-}
-
-.receipt-line-divider {
-  border: 0;
-  border-top: 1px solid var(--color-hairline);
-  margin: 4px 0;
-}
-
-.grand-total-row {
-  font-size: 14.5px;
-  font-weight: 700;
-  margin-top: 2px;
-}
-
-.total-lbl {
-  color: var(--color-ink);
-}
-
-.total-val {
-  color: var(--color-ink);
-}
-
-/* Bank Refund Form */
-.bank-refund-form {
-  border-top: 1px solid var(--color-hairline);
-  padding-top: 20px;
-}
-
-.bank-section-title {
-  font-size: 14.5px;
-  font-weight: 700;
-  color: var(--color-ink);
-  margin: 0;
-  font-family: var(--font-sans);
-}
-
-.bank-section-subtitle {
-  font-size: 12px;
-  color: var(--color-muted);
-  margin: 4px 0 16px 0;
-  font-family: var(--font-sans);
-  line-height: 1.4;
-}
-
-.bank-inputs-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* Custom Select styling */
-.form-group-select {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.select-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  text-align: left;
-}
-
-.select-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.select-custom {
-  width: 100%;
-  height: 52px;
-  padding: 0 40px 0 16px;
-  border: 1px solid var(--color-hairline);
-  border-radius: 8px;
-  background-color: var(--color-canvas);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  font-size: 14.5px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  box-sizing: border-box;
-  transition: border-color 0.15s ease;
-}
-
-.select-custom:focus {
-  border-color: var(--color-ink);
-  border-width: 2px;
-}
-
-.select-arrow-icon {
-  position: absolute;
-  top: 50%;
-  right: 16px;
-  transform: translateY(-50%);
-  color: var(--color-muted);
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-}
-
-.chevron-down {
-  width: 18px;
-  height: 18px;
-}
-
-/* Footer Action Buttons */
-.modal-footer-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  width: 100%;
-}
-
-.btn-modal-cancel {
-  padding: 12px 24px;
-  background: transparent;
-  border: 1px solid var(--color-hairline);
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-muted);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: var(--font-sans);
-}
-
-.btn-modal-cancel:hover {
-  background: var(--color-surface-soft);
-  color: var(--color-ink);
-  border-color: var(--color-muted-soft);
-}
-
-.btn-modal-submit {
-  padding: 12px 24px;
-  background: #ff385c;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #ffffff;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: var(--font-sans);
-  box-shadow: 0 2px 8px rgba(255, 56, 92, 0.15);
-}
-
-.btn-modal-submit:hover:not(:disabled) {
-  background: #e00b41;
-  transform: translateY(-1px);
-}
-
-.btn-modal-submit:active:not(:disabled) {
-  transform: translateY(0) scale(0.98);
-}
-
-.btn-modal-submit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-</style>

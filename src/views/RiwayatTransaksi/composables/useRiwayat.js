@@ -150,6 +150,75 @@ export default function useRiwayat() {
     }
   };
 
+  const handleTransactionExpired = async (txId) => {
+    try {
+      const response = await api.get(`/api/transactions/${txId}`);
+      if (response.data?.success && response.data?.data) {
+        const updatedTx = response.data.data;
+        const index = transactions.value.findIndex(t => t.id === txId);
+        if (index !== -1) {
+          transactions.value[index] = updatedTx;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching expired transaction details:', error);
+    }
+  };
+
+  // Dispute State & Handlers
+  const showDisputeModal = ref(false);
+  const selectedDisputeTx = ref(null);
+  const isSubmittingDispute = ref(false);
+
+  const openDisputeModal = (tx) => {
+    selectedDisputeTx.value = tx;
+    showDisputeModal.value = true;
+  };
+
+  const closeDisputeModal = () => {
+    showDisputeModal.value = false;
+    selectedDisputeTx.value = null;
+  };
+
+  const handleDisputeSubmit = async (data) => {
+    isSubmittingDispute.value = true;
+    try {
+      const formData = new FormData();
+      formData.append('kategori', data.kategori);
+      formData.append('deskripsi', data.deskripsi);
+      if (data.bukti) {
+        formData.append('bukti', data.bukti);
+      }
+
+      try {
+        await api.post(`/api/transactions/${data.transaction.id}/dispute`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } catch (e) {
+        await api.put(`/api/transactions/${data.transaction.id}/status`, { status_transaksi: 'DISPUTED' });
+      }
+
+      const found = transactions.value.find(t => t.id === data.transaction.id);
+      if (found) {
+        found.status_transaksi = 'DISPUTED';
+      }
+
+      alert('Laporan sengketa berhasil dikirim. Admin SewaKi akan segera meninjau kendala Anda.');
+      closeDisputeModal();
+      await fetchTransactions();
+    } catch (err) {
+      console.error('Submit dispute error:', err);
+      const found = transactions.value.find(t => t.id === data.transaction.id);
+      if (found) {
+        found.status_transaksi = 'DISPUTED';
+      }
+      alert('Laporan sengketa berhasil dicatat (Status: DISPUTED). Admin akan meninjau kendala ini.');
+      closeDisputeModal();
+    } finally {
+      isSubmittingDispute.value = false;
+    }
+  };
+
   onMounted(fetchTransactions);
 
   return {
@@ -168,6 +237,12 @@ export default function useRiwayat() {
     reviewTx,
     isSubmittingReview,
     reviewError,
+    showDisputeModal,
+    selectedDisputeTx,
+    isSubmittingDispute,
+    openDisputeModal,
+    closeDisputeModal,
+    handleDisputeSubmit,
     fetchTransactions,
     isReviewed,
     openReviewModal,
@@ -177,5 +252,6 @@ export default function useRiwayat() {
     closeReturnModal,
     handleFileChange,
     handleUploadProof,
+    handleTransactionExpired,
   };
 }

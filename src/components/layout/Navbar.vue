@@ -113,285 +113,86 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <header class="top-nav-container">
-    <div class="container top-nav-inner">
+  <header class="bg-white border-b border-[#e5e7eb] sticky top-0 z-[100] h-[64px]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-full">
       <div class="brand">
-        <router-link to="/" class="logo">
-          sewaki<span class="logo-dot">.</span>
+        <router-link :to="isPemilik ? '/dashboard' : '/'" class="text-[20px] font-bold text-[#111111] tracking-[-0.5px]">
+          sewaki<span class="text-[#3b82f6]">.</span>
         </router-link>
       </div>
 
-      <nav class="nav-links">
-        <router-link to="/" class="nav-item">Beranda</router-link>
-
+      <nav class="flex items-center gap-6">
+        <!-- Guest Navigation Links -->
         <template v-if="!isAuthenticated">
-          <router-link to="/login" class="nav-item">Masuk</router-link>
-          <router-link to="/register" class="btn-nav">Daftar</router-link>
+          <router-link to="/" class="font-['Inter'] text-sm font-medium text-[#6b7280] transition-colors duration-150 ease-in-out py-1 relative hover:text-[#111111]" active-class="text-[#111111]">Beranda</router-link>
+          <router-link to="/login" class="font-['Inter'] text-sm font-medium text-[#6b7280] transition-colors duration-150 ease-in-out py-1 relative hover:text-[#111111]" active-class="text-[#111111]">Masuk</router-link>
+          <router-link to="/register" class="px-4 py-2 bg-[#111111] text-white rounded-md text-sm font-semibold">Daftar</router-link>
         </template>
 
+        <!-- Authenticated Navigation Links -->
         <template v-else>
-          <router-link v-if="isAdmin" to="/admin/dashboard" class="nav-item">Admin</router-link>
-          <router-link v-if="isPemilik" to="/dashboard" class="nav-item">Dashboard</router-link>
-          <router-link v-if="isPemilik" to="/tambah-barang" class="nav-item">Tambah</router-link>
-          <router-link to="/riwayat" class="nav-item">Pesananku</router-link>
-          <router-link v-if="isPemilik" to="/kelola" class="nav-item">Kelola</router-link>
-          <router-link to="/profile" class="nav-item">Profil</router-link>
+          <!-- Admin -->
+          <router-link v-if="isAdmin" to="/admin/dashboard" class="font-['Inter'] text-sm font-medium text-[#6b7280] transition-colors duration-150 ease-in-out py-1 relative hover:text-[#111111]" active-class="text-[#111111]">Admin</router-link>
+          
+          <!-- Owner (Pemilik Barang) -->
+          <template v-if="isPemilik">
+            <router-link to="/dashboard" class="font-['Inter'] text-sm font-medium text-[#6b7280] transition-colors duration-150 ease-in-out py-1 relative hover:text-[#111111]" active-class="text-[#111111]">Dashboard</router-link>
+            <router-link to="/tambah-barang" class="font-['Inter'] text-sm font-medium text-[#6b7280] transition-colors duration-150 ease-in-out py-1 relative hover:text-[#111111]" active-class="text-[#111111]">Tambah Barang</router-link>
+            <router-link to="/kelola" class="font-['Inter'] text-sm font-medium text-[#6b7280] transition-colors duration-150 ease-in-out py-1 relative hover:text-[#111111]" active-class="text-[#111111]">Kelola Pesanan</router-link>
+          </template>
+
+          <!-- Renter (Penyewa) -->
+          <template v-else-if="!isAdmin">
+            <router-link to="/" class="font-['Inter'] text-sm font-medium text-[#6b7280] transition-colors duration-150 ease-in-out py-1 relative hover:text-[#111111]" active-class="text-[#111111]">Beranda</router-link>
+            <router-link to="/riwayat" class="font-['Inter'] text-sm font-medium text-[#6b7280] transition-colors duration-150 ease-in-out py-1 relative hover:text-[#111111]" active-class="text-[#111111]">Pesananku</router-link>
+          </template>
+
+          <!-- Shared Links -->
+          <router-link to="/profile" class="font-['Inter'] text-sm font-medium text-[#6b7280] transition-colors duration-150 ease-in-out py-1 relative hover:text-[#111111]" active-class="text-[#111111]">Profil</router-link>
 
           <!-- Notification Bell -->
-          <div class="notification-container">
-            <button @click.stop="toggleNotifications" class="bell-btn" aria-label="Notifikasi">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bell-icon">
+          <div class="notification-container relative flex items-center">
+            <button @click.stop="toggleNotifications" class="bg-transparent border-none text-[#6b7280] cursor-pointer p-1.5 flex items-center justify-center rounded-full hover:text-[#111111] hover:bg-[#f8f9fa]" aria-label="Notifikasi">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-[20px] h-[20px]">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
-              <span v-if="unreadCount > 0" class="badge-count">{{ unreadCount }}</span>
+              <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 bg-[#ef4444] text-white text-[10px] font-bold px-[5px] py-[1px] rounded-full min-w-[16px] text-center">{{ unreadCount }}</span>
             </button>
 
             <!-- Dropdown -->
-            <div v-if="showNotifications" class="dropdown-panel">
-              <div class="dropdown-header">
-                <h3>Notifikasi</h3>
-                <button v-if="unreadCount > 0" @click="markAllAsRead" class="mark-all-btn">Tandai semua dibaca</button>
+            <div v-if="showNotifications" class="absolute top-full right-0 mt-2 w-[320px] bg-white border border-[#e5e7eb] rounded-lg shadow-md z-[200] overflow-hidden">
+              <div class="flex justify-between items-center p-4 border-b border-[#e5e7eb]">
+                <h3 class="m-0 text-sm font-semibold text-[#111111]">Notifikasi</h3>
+                <button v-if="unreadCount > 0" @click="markAllAsRead" class="bg-transparent border-none text-[#3b82f6] text-xs font-semibold cursor-pointer">Tandai semua dibaca</button>
               </div>
-              <div class="dropdown-body">
-                <div v-if="notifications.length === 0" class="empty-state">
+              <div class="max-h-[300px] overflow-y-auto">
+                <div v-if="notifications.length === 0" class="p-8 text-center text-[#6b7280] text-xs">
                   Tidak ada notifikasi baru
                 </div>
-                <div v-else class="notification-list">
+                <div v-else class="flex flex-col">
                   <div 
                     v-for="notification in notifications" 
                     :key="notification.id" 
-                    class="notification-item"
-                    :class="{ 'unread': !notification.is_read }"
+                    class="p-4 border-b border-[#f3f4f6] last:border-b-0 cursor-pointer text-left"
+                    :class="{ 'bg-[#f8f9fa]': !notification.is_read }"
                     @click="markAsRead(notification.id)"
                   >
-                    <div class="notif-header">
-                      <span class="notif-title">{{ notification.title }}</span>
-                      <span v-if="!notification.is_read" class="unread-dot"></span>
+                    <div class="flex justify-between items-center">
+                      <span class="font-semibold text-xs text-[#111111]">{{ notification.title }}</span>
+                      <span v-if="!notification.is_read" class="w-1.5 h-1.5 bg-[#3b82f6] rounded-full"></span>
                     </div>
-                    <p class="notif-message">{{ notification.message }}</p>
-                    <span class="notif-time">{{ new Date(notification.created_at).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' }) }}</span>
+                    <p class="mt-1 mb-0 text-xs text-[#374151]">{{ notification.message }}</p>
+                    <span class="block mt-1 text-[10px] text-[#898989]">{{ new Date(notification.created_at).toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' }) }}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <button @click="handleLogout" class="btn-logout">Keluar</button>
+          <button @click="handleLogout" class="bg-transparent text-[#ef4444] border border-[rgba(239,68,68,0.2)] px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-colors duration-150 ease-in-out hover:bg-[rgba(239,68,68,0.05)]">Keluar</button>
         </template>
       </nav>
     </div>
   </header>
 </template>
-
-<style scoped>
-.top-nav-container {
-  background-color: var(--color-canvas);
-  border-bottom: 1px solid var(--color-hairline);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: 64px;
-}
-
-.top-nav-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 100%;
-}
-
-.logo {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--color-ink);
-  letter-spacing: -0.5px;
-}
-
-.logo-dot {
-  color: var(--color-primary);
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-
-.nav-item {
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-muted);
-  transition: color 0.15s ease;
-  position: relative;
-  padding: 4px 0;
-}
-
-.nav-item:hover,
-.nav-item.router-link-active {
-  color: var(--color-ink);
-}
-
-.btn-nav {
-  padding: 8px 16px;
-  background-color: var(--color-primary);
-  color: var(--color-on-primary);
-  border-radius: var(--rounded-md);
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.btn-logout {
-  background: transparent;
-  color: var(--color-error);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  padding: 6px 12px;
-  border-radius: var(--rounded-md);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.btn-logout:hover {
-  background-color: rgba(239, 68, 68, 0.05);
-}
-
-.notification-container {
-  position: relative;
-}
-
-.bell-btn {
-  background: transparent;
-  border: none;
-  color: var(--color-muted);
-  cursor: pointer;
-  padding: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--rounded-full);
-}
-
-.bell-btn:hover {
-  color: var(--color-ink);
-  background-color: var(--color-surface-soft);
-}
-
-.bell-icon {
-  width: 20px;
-  height: 20px;
-}
-
-.badge-count {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background-color: var(--color-error);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: var(--rounded-pill);
-  min-width: 16px;
-  text-align: center;
-}
-
-.dropdown-panel {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: var(--spacing-sm);
-  width: 320px;
-  background-color: var(--color-canvas);
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--rounded-lg);
-  box-shadow: var(--shadow-md);
-  z-index: 200;
-  overflow: hidden;
-}
-
-.dropdown-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md);
-  border-bottom: 1px solid var(--color-hairline);
-}
-
-.dropdown-header h3 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.mark-all-btn {
-  background: transparent;
-  border: none;
-  color: var(--color-brand-accent);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.dropdown-body {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.empty-state {
-  padding: var(--spacing-xl);
-  text-align: center;
-  color: var(--color-muted);
-  font-size: 13px;
-}
-
-.notification-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.notification-item {
-  padding: var(--spacing-md);
-  border-bottom: 1px solid var(--color-hairline-soft);
-  cursor: pointer;
-  text-align: left;
-}
-
-.notification-item.unread {
-  background-color: var(--color-surface-soft);
-}
-
-.notif-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.notif-title {
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--color-ink);
-}
-
-.unread-dot {
-  width: 6px;
-  height: 6px;
-  background-color: var(--color-brand-accent);
-  border-radius: var(--rounded-full);
-}
-
-.notif-message {
-  margin: 4px 0 0;
-  font-size: 12px;
-  color: var(--color-body);
-}
-
-.notif-time {
-  display: block;
-  margin-top: 4px;
-  font-size: 10px;
-  color: var(--color-muted-soft);
-}
-</style>

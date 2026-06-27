@@ -10,6 +10,7 @@ import Katalog from '../views/Katalog/index.vue';
 const TambahBarang = () => import('../views/TambahBarang/index.vue');
 const AdminKYC = () => import('../views/Admin/KYC/index.vue');
 const AdminDashboard = () => import('../views/Admin/Dashboard/index.vue');
+const DisputeManagement = () => import('../views/Admin/DisputeManagement.vue');
 const RiwayatTransaksi = () => import('../views/RiwayatTransaksi/index.vue');
 const KelolaPesanan = () => import('../views/KelolaPesanan/index.vue');
 const Dashboard = () => import('../views/Dashboard/index.vue');
@@ -84,6 +85,12 @@ const routes = [
     component: AdminDashboard,
     meta: { requiresAuth: true, requiresAdmin: true },
   },
+  {
+    path: '/admin/disputes',
+    name: 'AdminDisputes',
+    component: DisputeManagement,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
   // Fallback wildcard route
   {
     path: '/:pathMatch(.*)*',
@@ -99,6 +106,13 @@ const router = createRouter({
 // Route Navigation Guards
 router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('token');
+  const role = (localStorage.getItem('role') || '').toLowerCase();
+
+  // Pengalihan otomatis untuk role owner (pemilik) yang mencoba mengakses beranda utama (/)
+  if (to.path === '/' && isAuthenticated && role === 'pemilik') {
+    next('/dashboard');
+    return;
+  }
 
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // Rute butuh login, arahkan ke login jika belum terotentikasi
@@ -107,8 +121,7 @@ router.beforeEach((to, from, next) => {
     } else {
       // Cek peran admin
       if (to.matched.some(record => record.meta.requiresAdmin)) {
-        const role = localStorage.getItem('role') || '';
-        if (role.toLowerCase() !== 'admin') {
+        if (role !== 'admin') {
           alert('Akses ditolak. Rute ini hanya untuk Admin.');
           next('/profile');
           return;
@@ -116,8 +129,7 @@ router.beforeEach((to, from, next) => {
       }
       // Cek peran pemilik barang
       if (to.matched.some(record => record.meta.role === 'pemilik')) {
-        const role = localStorage.getItem('role') || '';
-        if (role.toLowerCase() !== 'pemilik') {
+        if (role !== 'pemilik') {
           alert('Akses ditolak. Halaman ini hanya untuk Pemilik Barang.');
           next('/');
           return;
@@ -125,8 +137,8 @@ router.beforeEach((to, from, next) => {
       }
       // Cek status KYC untuk halaman tambah barang
       if (to.path === '/tambah-barang') {
-        const kycStatus = localStorage.getItem('kyc_status') || 'unverified';
-        if (kycStatus.toLowerCase() !== 'verified') {
+        const kycStatus = (localStorage.getItem('kyc_status') || 'unverified').toLowerCase();
+        if (kycStatus !== 'verified') {
           alert('Anda harus mengunggah KTP dan menunggu persetujuan Admin sebelum dapat melanjutkan');
           next('/profile');
           return;
@@ -135,9 +147,13 @@ router.beforeEach((to, from, next) => {
       next();
     }
   } else if (to.matched.some(record => record.meta.guestOnly)) {
-    // Rute hanya untuk tamu (non-login), arahkan ke beranda jika sudah terotentikasi
+    // Rute hanya untuk tamu (non-login), arahkan sesuai role jika sudah terotentikasi
     if (isAuthenticated) {
-      next('/');
+      if (role === 'pemilik') {
+        next('/dashboard');
+      } else {
+        next('/');
+      }
     } else {
       next();
     }

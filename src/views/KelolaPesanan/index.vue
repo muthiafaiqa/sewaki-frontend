@@ -65,6 +65,7 @@
         :rentals="rentals" 
         @disburse="openDisburseDialog" 
         @chat="hubungiWhatsApp" 
+        @dispute="openDisputeModal"
       />
     </div>
 
@@ -75,12 +76,22 @@
       @close="closeDisburseDialog"
       @completed="onInspectionCompleted"
     />
+
+    <!-- Dispute Complaint Modal -->
+    <DisputeModal
+      :show="showDisputeModal"
+      :transaction="selectedDisputeTx"
+      :isLoading="isSubmittingDispute"
+      @close="closeDisputeModal"
+      @submit="handleDisputeSubmit"
+    />
   </div>
 </template>
 
 <script>
 import OrderList from './components/OrderList.vue';
 import InspectionModal from './components/InspectionModal.vue';
+import DisputeModal from '../../components/ui/DisputeModal.vue';
 import useKelolaPesanan from './composables/useKelolaPesanan';
 
 export default {
@@ -88,6 +99,7 @@ export default {
   components: {
     OrderList,
     InspectionModal,
+    DisputeModal,
   },
   setup() {
     const {
@@ -97,6 +109,12 @@ export default {
       successMessage,
       showDisburseModal,
       selectedTx,
+      showDisputeModal,
+      selectedDisputeTx,
+      isSubmittingDispute,
+      openDisputeModal,
+      closeDisputeModal,
+      handleDisputeSubmit,
       fetchData,
       openDisburseDialog,
       closeDisburseDialog,
@@ -111,6 +129,12 @@ export default {
       successMessage,
       showDisburseModal,
       selectedTx,
+      showDisputeModal,
+      selectedDisputeTx,
+      isSubmittingDispute,
+      openDisputeModal,
+      closeDisputeModal,
+      handleDisputeSubmit,
       fetchData,
       openDisburseDialog,
       closeDisburseDialog,

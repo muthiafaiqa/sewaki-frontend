@@ -89,13 +89,28 @@
             <!-- Actions buttons group -->
             <td class="actions-cell">
               <div class="actions-buttons-container">
-                <button 
-                  v-if="tx.status_transaksi?.toLowerCase() === 'menunggu_inspeksi'" 
-                  class="btn-complete-rent"
-                  @click="$emit('disburse', tx)"
-                >
-                  Selesaikan & Refund
-                </button>
+                <template v-if="tx.status_transaksi?.toLowerCase() === 'menunggu_inspeksi'">
+                  <button 
+                    class="btn-complete-rent"
+                    @click="$emit('disburse', tx)"
+                  >
+                    Selesaikan & Refund
+                  </button>
+                  <button 
+                    class="px-3 py-1.5 bg-[#f97316] hover:bg-[#ea580c] text-white rounded-md text-xs font-bold font-sans transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer whitespace-nowrap"
+                    @click="$emit('dispute', tx)"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>Ajukan Komplain</span>
+                  </button>
+                </template>
+                <span v-else-if="tx.status_transaksi?.toLowerCase() === 'disputed' || tx.status_transaksi?.toLowerCase() === 'sengketa'" class="state-label font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-md text-xs">
+                  Dalam Sengketa (Admin)
+                </span>
                 <span v-else-if="tx.status_transaksi?.toLowerCase() === 'selesai'" class="state-label completed">
                   Selesai / Dicairkan
                 </span>
@@ -133,7 +148,7 @@ export default {
       required: true,
     },
   },
-  emits: ['disburse', 'chat'],
+  emits: ['disburse', 'chat', 'dispute'],
   setup() {
     const formatPrice = (value) => {
       if (!value && value !== 0) return 'Rp 0';
