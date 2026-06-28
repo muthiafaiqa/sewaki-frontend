@@ -166,6 +166,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import LoginForm from './components/LoginForm.vue';
 import api from '../../../services/api';
+import { useAuthStore } from '../../../stores/authStore';
 
 export default {
   name: 'LoginView',
@@ -174,6 +175,7 @@ export default {
   },
   setup() {
     const router = useRouter();
+    const authStore = useAuthStore();
     const isLoading = ref(false);
     const errorMessage = ref('');
     const successMessage = ref('');
@@ -190,15 +192,22 @@ export default {
         });
 
         const token = response.data?.data?.token;
+        const role = response.data?.data?.role || response.data?.role || '';
         if (token) {
-          localStorage.setItem('token', token);
-          const role = response.data?.data?.role || response.data?.role;
-          if (role) {
-            localStorage.setItem('role', role.toLowerCase());
-          }
+          // Simpan token dan role secara reaktif ke store & localStorage
+          authStore.login(token, role);
+          
           successMessage.value = 'Login berhasil! Mengalihkan...';
+          
+          const roleVal = role.toLowerCase();
           setTimeout(() => {
-            router.push('/');
+            if (roleVal === 'pemilik') {
+              router.push('/dashboard');
+            } else if (roleVal === 'penyewa' || roleVal === 'user' || roleVal === 'penyewa barang') {
+              router.push('/katalog');
+            } else {
+              router.push('/');
+            }
           }, 1000);
         } else {
           throw new Error('Token tidak ditemukan dalam respons API');

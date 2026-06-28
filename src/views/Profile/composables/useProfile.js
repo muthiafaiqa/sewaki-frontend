@@ -1,7 +1,9 @@
 import { ref, computed, onMounted } from 'vue';
 import api from '../../../services/api';
+import { useAuthStore } from '../../../stores/authStore';
 
 export default function useProfile(router) {
+  const authStore = useAuthStore();
   const user = ref(null);
   const isLoading = ref(true);
   const errorMessage = ref('');
@@ -80,9 +82,14 @@ export default function useProfile(router) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('kyc_status');
+    // Clear global auth store (which also clears localStorage keys & sessionStorage)
+    authStore.logout();
+
+    // Clear local profile refs
+    user.value = null;
+    kycStatus.value = 'unverified';
+    selectedFile.value = null;
+
     redirecting.value = true;
     errorMessage.value = 'Mengalihkan ke halaman login...';
     

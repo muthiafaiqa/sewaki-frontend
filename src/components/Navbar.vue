@@ -2,22 +2,21 @@
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../services/api';
+import { useAuthStore } from '../stores/authStore';
 
 const route = useRoute();
 const router = useRouter();
-const isAuthenticated = ref(false);
-const isAdmin = ref(false);
-const isPemilik = ref(false);
+
+const authStore = useAuthStore();
+const isAuthenticated = authStore.isLoggedIn;
+const isAdmin = authStore.isAdmin;
+const isPemilik = authStore.isPemilik;
 
 const notifications = ref([]);
 const showNotifications = ref(false);
 let fetchInterval = null;
 
 const checkAuth = () => {
-  isAuthenticated.value = !!localStorage.getItem('token');
-  const role = localStorage.getItem('role') || '';
-  isAdmin.value = role.toLowerCase() === 'admin';
-  isPemilik.value = role.toLowerCase() === 'pemilik';
   if (isAuthenticated.value) {
     fetchNotifications();
     startPolling();
@@ -86,6 +85,16 @@ const closeNotifications = (e) => {
   }
 };
 
+// Watch authentication status changes
+watch(isAuthenticated, (newValue) => {
+  if (newValue) {
+    fetchNotifications();
+    startPolling();
+  } else {
+    stopPolling();
+  }
+}, { immediate: true });
+
 // Re-check authentication status on route change
 watch(() => route.path, () => {
   checkAuth();
@@ -102,12 +111,7 @@ onUnmounted(() => {
 });
 
 const handleLogout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('role');
-  localStorage.removeItem('kyc_status');
-  isAuthenticated.value = false;
-  isAdmin.value = false;
-  isPemilik.value = false;
+  authStore.logout();
   stopPolling();
   router.push('/login');
 };
