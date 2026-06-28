@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../services/api';
 import BaseButton from '../components/ui/BaseButton.vue';
@@ -63,6 +63,92 @@ const fetchReviews = async () => {
   }
 };
 
+const currentUser = ref(null);
+
+const fetchCurrentUser = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  try {
+    const response = await api.get('/api/auth/profile');
+    currentUser.value = response.data?.data || response.data;
+  } catch (error) {
+    console.error('Fetch current user error:', error);
+  }
+};
+
+const isOwner = computed(() => {
+  if (!item.value || !currentUser.value) return false;
+  const ownerId = item.value.pemilik_id || item.value.owner_id || item.value.user_id;
+  return String(ownerId) === String(currentUser.value.id);
+});
+
+const handleDeleteItem = async () => {
+  const confirmDelete = window.confirm('Apakah Anda yakin ingin menghapus barang ini? Tindakan ini tidak dapat dibatalkan.');
+  if (!confirmDelete) return;
+
+  try {
+    await api.delete(`/api/items/${itemId}`);
+    alert('Barang berhasil dihapus.');
+    router.push('/');
+  } catch (error) {
+    console.error('Delete item error:', error);
+    const serverMessage = error.response?.data?.message || error.response?.data?.error;
+    if (serverMessage) {
+      alert(`Gagal menghapus barang: ${serverMessage}`);
+    } else {
+      alert('Terjadi kesalahan saat menghapus barang. Silakan coba lagi nanti.');
+    }
+  }
+};
+
+const bookedDates = ref([]);
+const dateWarning = ref('');
+
+const fetchBookedDates = async () => {
+  try {
+    const response = await api.get(`/api/items/${itemId}/booked-dates`);
+    bookedDates.value = response.data?.data || response.data || [];
+  } catch (error) {
+    console.error('Fetch booked dates error:', error);
+  }
+};
+
+const isOverlapping = (start, end) => {
+  if (!start || !end) return false;
+  const s = new Date(start);
+  const e = new Date(end);
+  s.setHours(0, 0, 0, 0);
+  e.setHours(0, 0, 0, 0);
+
+  return bookedDates.value.some(range => {
+    const bookedStart = new Date(range.start);
+    const bookedEnd = new Date(range.end);
+    bookedStart.setHours(0, 0, 0, 0);
+    bookedEnd.setHours(0, 0, 0, 0);
+    return s <= bookedEnd && e >= bookedStart;
+  });
+};
+
+watch([startDate, endDate], ([newStart, newEnd]) => {
+  if (newStart && newEnd) {
+    if (isOverlapping(newStart, newEnd)) {
+      dateWarning.value = 'Tanggal tersebut sudah dipesan oleh pengguna lain, silakan pilih rentang tanggal lain.';
+    } else {
+      dateWarning.value = '';
+    }
+  } else {
+    dateWarning.value = '';
+  }
+});
+
+const formatDateShort = (dateStr) => {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+  });
+};
+
 const formatDate = (dateStr) => {
   if (!dateStr) return '';
   return new Date(dateStr).toLocaleDateString('id-ID', {
@@ -75,6 +161,8 @@ const formatDate = (dateStr) => {
 onMounted(() => {
   fetchItemDetails();
   fetchReviews();
+  fetchCurrentUser();
+  fetchBookedDates();
 });
 
 // Computed Properties for Receipt
@@ -119,6 +207,11 @@ const closeModal = () => {
 
 const submitTransaction = async () => {
   if (durationDays.value <= 0) return;
+
+  if (isOverlapping(startDate.value, endDate.value)) {
+    alert('Tanggal tersebut sudah dipesan oleh pengguna lain, silakan pilih rentang tanggal lain.');
+    return;
+  }
 
   const token = localStorage.getItem('token');
   if (!token) {
@@ -322,8 +415,11 @@ const hubungiPemilik = () => {
             </div>
           </div>
 
-          <!-- Rent Button Trigger & Chat Pemilik -->
-          <div class="flex gap-4 mt-8">
+          <!-- Rent Button Trigger & Chat Pemilik / Hapus Barang -->
+          <div v-if="isOwner" class="flex gap-4 mt-8">
+            <button @click="handleDeleteItem" class="w-full py-4 bg-[#ef4444] hover:bg-[#dc2626] text-white border-none rounded-xl text-base font-bold cursor-pointer transition-all shadow-md shadow-[#ef4444]/20 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]">Hapus Barang</button>
+          </div>
+          <div v-else class="flex gap-4 mt-8">
             <button @click="handleRentTrigger" class="flex-[2] py-4 bg-[#ff385c] hover:bg-[#e00b41] text-white border-none rounded-xl text-base font-bold cursor-pointer transition-all shadow-md shadow-[#ff385c]/20 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]">Pinjam Barang Ini</button>
             <button @click="hubungiPemilik" class="flex-1 py-4 bg-[#25d366] hover:bg-[#20ba5a] text-white border-none rounded-xl text-[15px] font-bold cursor-pointer inline-flex items-center justify-center gap-2 transition-all shadow-md shadow-[#25d366]/20 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-5 h-5">
@@ -390,6 +486,16 @@ const hubungiPemilik = () => {
               </div>
             </div>
 
+            <!-- Booked Dates Warning / Info -->
+            <div v-if="bookedDates.length > 0" class="mb-5">
+              <label class="text-xs font-bold text-muted uppercase tracking-wider block mb-2">Tanggal Tidak Tersedia (Sudah Dipesan)</label>
+              <div class="flex flex-wrap gap-2">
+                <span v-for="(range, idx) in bookedDates" :key="idx" class="px-2.5 py-1 bg-red-50 text-red-700 border border-red-200 rounded-md text-xs font-semibold">
+                  {{ formatDateShort(range.start) }} s/d {{ formatDateShort(range.end) }}
+                </span>
+              </div>
+            </div>
+
             <!-- Error State inside Modal -->
             <div v-if="durationDays <= 0" class="flex items-center gap-2 bg-error/5 border border-error/20 rounded-lg p-3 text-error text-xs font-medium mb-5">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-[18px] h-[18px] shrink-0">
@@ -398,6 +504,16 @@ const hubungiPemilik = () => {
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
               </svg>
               <span>Tanggal selesai harus setelah tanggal mulai sewa.</span>
+            </div>
+
+            <!-- Error State: Overlapping Booked Dates -->
+            <div v-if="dateWarning" class="flex items-center gap-2 bg-error/5 border border-error/20 rounded-lg p-3 text-error text-xs font-medium mb-5">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-[18px] h-[18px] shrink-0">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <span>{{ dateWarning }}</span>
             </div>
 
             <!-- Bill Breakdown / Receipt -->
@@ -476,7 +592,7 @@ const hubungiPemilik = () => {
             <button 
               @click="submitTransaction" 
               class="py-3 px-6 bg-[#ff385c] hover:bg-[#e00b41] text-white border-none rounded-lg text-sm font-bold cursor-pointer transition-colors disabled:bg-slate-200 disabled:text-muted disabled:cursor-not-allowed" 
-              :disabled="durationDays <= 0 || isSubmitting"
+              :disabled="durationDays <= 0 || !!dateWarning || isSubmitting"
             >
               <span v-if="isSubmitting">Memproses...</span>
               <span v-else>Lanjut ke Pembayaran</span>

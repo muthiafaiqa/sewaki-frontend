@@ -109,16 +109,6 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('token');
   const role = (localStorage.getItem('role') || '').toLowerCase();
 
-  // Pengalihan otomatis untuk pengguna terotentikasi yang mencoba mengakses beranda utama (/)
-  if (to.path === '/' && isAuthenticated) {
-    if (role === 'pemilik') {
-      next('/dashboard');
-    } else {
-      next('/katalog');
-    }
-    return;
-  }
-
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // Rute butuh login, arahkan ke login jika belum terotentikasi
     if (!isAuthenticated) {
@@ -152,12 +142,12 @@ router.beforeEach((to, from, next) => {
       next();
     }
   } else if (to.matched.some(record => record.meta.guestOnly)) {
-    // Rute hanya untuk tamu (non-login), arahkan sesuai role jika sudah terotentikasi
+    // Rute hanya untuk tamu (non-login), arahkan ke beranda jika sudah terotentikasi
     if (isAuthenticated) {
       if (role === 'pemilik') {
         next('/dashboard');
       } else {
-        next('/katalog');
+        next('/');
       }
     } else {
       next();
