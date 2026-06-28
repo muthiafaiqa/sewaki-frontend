@@ -4,7 +4,7 @@
     <div class="col-span-1 md:col-span-3 flex justify-center items-center bg-surface-soft border-b md:border-b-0 md:border-r">
       <img 
         v-if="tx.item?.foto_barang"
-        :src="getImageUrl(tx.item.foto_barang)" 
+        :src="tx.item.foto_barang" 
         :alt="tx.item.nama_barang" 
         class="w-full h-full object-cover"
       />
@@ -199,14 +199,6 @@ export default {
       }
     };
 
-    const getImageUrl = (filename) => {
-      if (!filename) return '';
-      if (filename.startsWith('http://') || filename.startsWith('https://')) {
-        return filename;
-      }
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      return `${baseUrl.replace(/\/$/, '')}/uploads/${filename}`;
-    };
 
     const formatDate = (dateStr) => {
       if (!dateStr) return '';
@@ -276,7 +268,6 @@ export default {
       remainingTimeStr,
       formatPrice,
       getPriceDetails,
-      getImageUrl,
       formatDate,
       getDurationDays,
       getPaymentStatusColor,

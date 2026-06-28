@@ -3,7 +3,7 @@
     <div class="product-image-wrapper">
       <img 
         v-if="item.foto_barang"
-        :src="getImageUrl(item.foto_barang)" 
+        :src="item.foto_barang" 
         :alt="item.nama_barang || item.name" 
         class="product-image"
       />
@@ -62,18 +62,8 @@ export default {
       }).format(value);
     };
 
-    const getImageUrl = (filename) => {
-      if (!filename) return '';
-      if (filename.startsWith('http://') || filename.startsWith('https://')) {
-        return filename;
-      }
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      return `${baseUrl.replace(/\/$/, '')}/uploads/${filename}`;
-    };
-
     return {
       formatPrice,
-      getImageUrl,
     };
   },
 };

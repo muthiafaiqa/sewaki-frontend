@@ -37,14 +37,6 @@ const formatPrice = (value) => {
   }).format(value);
 };
 
-const getImageUrl = (filename) => {
-  if (!filename) return '';
-  if (filename.startsWith('http://') || filename.startsWith('https://')) {
-    return filename;
-  }
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-  return `${baseUrl.replace(/\/$/, '')}/uploads/${filename}`;
-};
 
 const fetchItemDetails = async () => {
   isLoading.value = true;
@@ -237,7 +229,7 @@ const hubungiPemilik = () => {
           <div class="relative w-full pt-[75%] rounded-xl overflow-hidden bg-surface-soft border border-hairline">
             <img 
               v-if="item.foto_barang"
-              :src="getImageUrl(item.foto_barang)" 
+              :src="item.foto_barang" 
               :alt="item.nama_barang || item.name" 
               class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-[1.02]"
             />

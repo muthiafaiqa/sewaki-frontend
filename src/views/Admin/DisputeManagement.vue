@@ -118,7 +118,7 @@
               <td class="py-[18px] px-[24px] align-middle box-border">
                 <div class="flex items-center gap-[12px]">
                   <div class="w-[44px] h-[44px] rounded-lg bg-surface-soft border border-hairline overflow-hidden shrink-0">
-                    <img v-if="dispute.item?.foto_barang" :src="getImageUrl(dispute.item.foto_barang)" class="w-full h-full object-cover" />
+                    <img v-if="dispute.item?.foto_barang" :src="dispute.item.foto_barang" class="w-full h-full object-cover" />
                     <span v-else class="flex items-center justify-center h-full text-xs font-bold text-muted">📦</span>
                   </div>
                   <div class="flex flex-col text-left">
@@ -215,7 +215,7 @@
           <div>
             <span class="block text-xs font-bold text-muted font-sans uppercase tracking-wider mb-2">Bukti Pendukung</span>
             <div v-if="selectedDispute.bukti_komplain" class="w-full max-h-[220px] rounded-lg overflow-hidden border border-[#e5e7eb] bg-[#f3f4f6]">
-              <img :src="getProofUrl(selectedDispute.bukti_komplain)" class="w-full h-full object-contain cursor-pointer" @click="openImageNewTab(selectedDispute.bukti_komplain)" />
+              <img :src="selectedDispute.bukti_komplain" class="w-full h-full object-contain cursor-pointer" @click="openImageNewTab(selectedDispute.bukti_komplain)" />
             </div>
             <span v-else class="text-xs text-muted-soft font-sans italic">Tidak ada foto/video bukti dilampirkan.</span>
           </div>
@@ -275,7 +275,7 @@ export default {
         tanggal_selesai: '2026-06-25',
         item: {
           nama_barang: 'Kamera DSLR Canon EOS 80D',
-          foto_barang: 'kamera_canon.jpg',
+          foto_barang: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80',
           pemilik: { nama: 'Rian Putra', email: 'rian.pemilik@example.com' }
         },
         penyewa: { nama: 'Adit Pratama', email: 'adit.penyewa@example.com' },
@@ -293,7 +293,7 @@ export default {
         tanggal_selesai: '2026-06-22',
         item: {
           nama_barang: 'Tenda Camping 4 Orang waterproof',
-          foto_barang: 'tenda_camping.jpg',
+          foto_barang: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=600&q=80',
           pemilik: { nama: 'Sari Indah', email: 'sari.pemilik@example.com' }
         },
         penyewa: { nama: 'Dewi Lestari', email: 'dewi.penyewa@example.com' },
@@ -342,21 +342,8 @@ export default {
       });
     });
 
-    const getImageUrl = (filename) => {
-      if (!filename) return '';
-      if (filename.startsWith('http://') || filename.startsWith('https://')) {
-        return filename;
-      }
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      return `${baseUrl.replace(/\/$/, '')}/uploads/${filename}`;
-    };
-
-    const getProofUrl = (filename) => {
-      return getImageUrl(filename);
-    };
-
     const openImageNewTab = (url) => {
-      window.open(getProofUrl(url), '_blank');
+      window.open(url, '_blank');
     };
 
     const formatPrice = (value) => {
@@ -434,8 +421,6 @@ export default {
       showDetailModal,
       selectedDispute,
       fetchDisputedTransactions,
-      getImageUrl,
-      getProofUrl,
       openImageNewTab,
       formatPrice,
       openDetailModal,

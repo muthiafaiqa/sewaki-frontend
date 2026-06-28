@@ -14,8 +14,8 @@
       <div class="proof-section">
         <label>Bukti Pengembalian Barang</label>
         <div v-if="transaction.bukti_pengembalian" class="proof-image-wrapper">
-          <a :href="getImageUrl(transaction.bukti_pengembalian)" target="_blank" title="Klik untuk memperbesar">
-            <img :src="getImageUrl(transaction.bukti_pengembalian)" alt="Bukti Pengembalian" class="proof-img" />
+          <a :href="transaction.bukti_pengembalian" target="_blank" title="Klik untuk memperbesar">
+            <img :src="transaction.bukti_pengembalian" alt="Bukti Pengembalian" class="proof-img" />
           </a>
           <small class="help-text">Klik gambar untuk membuka di tab baru.</small>
         </div>
@@ -121,14 +121,6 @@ const sisaDeposit = computed(() => {
 const jumlah_refund = sisaDeposit;
 
 // Methods
-const getImageUrl = (filename) => {
-  if (!filename) return '';
-  if (filename.startsWith('http://') || filename.startsWith('https://')) {
-    return filename;
-  }
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-  return `${baseUrl.replace(/\/$/, '')}/uploads/${filename}`;
-};
 
 const formatCurrency = (value) => {
   if (!value) return '0';
