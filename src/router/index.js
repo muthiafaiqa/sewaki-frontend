@@ -109,6 +109,17 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('token');
   const role = (localStorage.getItem('role') || '').toLowerCase();
 
+  // Redirect logged-in users attempting to access the root landing page ('/')
+  if (to.path === '/' && isAuthenticated) {
+    if (role === 'pemilik') {
+      next('/dashboard');
+      return;
+    } else {
+      next('/katalog');
+      return;
+    }
+  }
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // Rute butuh login, arahkan ke login jika belum terotentikasi
     if (!isAuthenticated) {
@@ -126,7 +137,7 @@ router.beforeEach((to, from, next) => {
       if (to.matched.some(record => record.meta.role === 'pemilik')) {
         if (role !== 'pemilik') {
           alert('Akses ditolak. Halaman ini hanya untuk Pemilik Barang.');
-          next('/');
+          next('/katalog');
           return;
         }
       }
@@ -142,12 +153,12 @@ router.beforeEach((to, from, next) => {
       next();
     }
   } else if (to.matched.some(record => record.meta.guestOnly)) {
-    // Rute hanya untuk tamu (non-login), arahkan ke beranda jika sudah terotentikasi
+    // Rute hanya untuk tamu (non-login), arahkan ke halaman yang sesuai jika sudah terotentikasi
     if (isAuthenticated) {
       if (role === 'pemilik') {
         next('/dashboard');
       } else {
-        next('/');
+        next('/katalog');
       }
     } else {
       next();
