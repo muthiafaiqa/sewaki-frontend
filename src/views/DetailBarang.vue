@@ -3,6 +3,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import api from '../services/api';
 import BaseButton from '../components/ui/BaseButton.vue';
+import { useAuthStore } from '../stores/authStore';
 
 const route = useRoute();
 const router = useRouter();
@@ -23,10 +24,27 @@ const endDate = ref(tomorrowStr);
 
 const itemId = route.params.id;
 
-// Bank details for deposit refund
-const bankDeposit = ref('BCA');
-const rekeningDeposit = ref('');
-const namaRekeningDeposit = ref('');
+const authStore = useAuthStore();
+
+// Bank details for deposit refund (initialize with store default values)
+const bankDeposit = ref(authStore.defaultBank.value || 'BCA');
+const rekeningDeposit = ref(authStore.defaultRekening.value || '');
+const namaRekeningDeposit = ref(authStore.defaultNamaRekening.value || '');
+
+// Watch showModal to automatically populate default bank details if available
+watch(showModal, (isOpen) => {
+  if (isOpen) {
+    if (authStore.defaultBank.value) {
+      bankDeposit.value = authStore.defaultBank.value;
+    }
+    if (authStore.defaultRekening.value) {
+      rekeningDeposit.value = authStore.defaultRekening.value;
+    }
+    if (authStore.defaultNamaRekening.value) {
+      namaRekeningDeposit.value = authStore.defaultNamaRekening.value;
+    }
+  }
+});
 
 const formatPrice = (value) => {
   if (!value && value !== 0) return 'Hubungi Pemilik';

@@ -27,12 +27,19 @@ export const useAuthStore = () => {
     role.value = '';
   };
 
+  const defaultBank = computed(() => localStorage.getItem('default_bank') || '');
+  const defaultRekening = computed(() => localStorage.getItem('default_rekening') || '');
+  const defaultNamaRekening = computed(() => localStorage.getItem('default_nama_rekening') || '');
+
   return {
     token,
     role,
     isLoggedIn,
     isAdmin,
     isPemilik,
+    defaultBank,
+    defaultRekening,
+    defaultNamaRekening,
     login,
     logout
   };

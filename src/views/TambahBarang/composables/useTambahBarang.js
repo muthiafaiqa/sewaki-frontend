@@ -3,6 +3,7 @@ import api from '../../../services/api';
 
 export default function useTambahBarang(router) {
   const isLoading = ref(false);
+  const isSubmitting = ref(false);
   const errorMessage = ref('');
   const successMessage = ref('');
   const selectedFile = ref(null);
@@ -89,6 +90,7 @@ export default function useTambahBarang(router) {
     if (!validateForm()) return;
 
     isLoading.value = true;
+    isSubmitting.value = true;
     try {
       const formData = new FormData();
       formData.append('name', form.nama_barang);
@@ -138,6 +140,7 @@ export default function useTambahBarang(router) {
       }
     } finally {
       isLoading.value = false;
+      isSubmitting.value = false;
     }
   };
 
@@ -145,6 +148,7 @@ export default function useTambahBarang(router) {
     form,
     errors,
     isLoading,
+    isSubmitting,
     errorMessage,
     successMessage,
     selectedFile,
