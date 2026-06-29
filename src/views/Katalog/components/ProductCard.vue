@@ -25,10 +25,17 @@
       <p class="product-desc">{{ item.deskripsi || item.description }}</p>
     </div>
 
-    <div class="product-actions mt-sm">
+    <div class="product-actions mt-sm flex flex-col gap-2">
       <BaseButton variant="primary" class="w-full" @click.stop="$emit('rent', item)">
         Pinjam Barang
       </BaseButton>
+      <button 
+        v-if="isAdmin" 
+        class="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-xs font-semibold cursor-pointer transition-colors duration-150"
+        @click.stop="$emit('delete', item.id)"
+      >
+        Hapus Produk (Admin)
+      </button>
     </div>
   </BaseCard>
 </template>
@@ -37,6 +44,7 @@
 import BaseCard from '../../../components/ui/BaseCard.vue';
 import BaseBadge from '../../../components/ui/BaseBadge.vue';
 import BaseButton from '../../../components/ui/BaseButton.vue';
+import { useAuthStore } from '../../../stores/authStore';
 
 export default {
   name: 'ProductCard',
@@ -51,8 +59,11 @@ export default {
       required: true,
     },
   },
-  emits: ['click', 'rent'],
+  emits: ['click', 'rent', 'delete'],
   setup() {
+    const authStore = useAuthStore();
+    const isAdmin = authStore.isAdmin;
+
     const formatPrice = (value) => {
       if (!value && value !== 0) return 'Hubungi Pemilik';
       return new Intl.NumberFormat('id-ID', {
@@ -64,6 +75,7 @@ export default {
 
     return {
       formatPrice,
+      isAdmin,
     };
   },
 };

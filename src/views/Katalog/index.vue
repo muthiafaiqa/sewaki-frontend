@@ -23,6 +23,7 @@
         :items="paginatedItems" 
         @click="navigateToDetail" 
         @rent="navigateToDetail"
+        @delete="handleDeleteProduct"
       />
 
       <!-- Pagination -->
@@ -273,6 +274,21 @@ export default {
       router.push('/profile');
     };
 
+    const handleDeleteProduct = async (itemId) => {
+      const confirmDelete = window.confirm('Apakah Anda yakin ingin menghapus barang ini? Tindakan ini tidak dapat dibatalkan.');
+      if (!confirmDelete) return;
+
+      try {
+        await api.delete(`/api/items/${itemId}`);
+        alert('Barang berhasil dihapus.');
+        fetchItems();
+      } catch (error) {
+        console.error('Delete item error:', error);
+        const serverMessage = error.response?.data?.message || error.response?.data?.error;
+        alert(serverMessage || 'Terjadi kesalahan saat menghapus barang.');
+      }
+    };
+
     onMounted(fetchItems);
 
     return {
@@ -289,6 +305,7 @@ export default {
       prevPage,
       navigateToDetail,
       navigateToProfile,
+      handleDeleteProduct,
     };
   },
 };

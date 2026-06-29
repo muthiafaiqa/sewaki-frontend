@@ -6,6 +6,7 @@
           :item="item" 
           @click="$emit('click', $event)" 
           @rent="$emit('rent', $event)"
+          @delete="$emit('delete', $event)"
         />
       </div>
     </div>
@@ -26,7 +27,7 @@ export default {
       required: true,
     },
   },
-  emits: ['click', 'rent'],
+  emits: ['click', 'rent', 'delete'],
 };
 </script>
 
